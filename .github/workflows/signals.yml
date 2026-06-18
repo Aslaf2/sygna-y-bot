@@ -2,7 +2,7 @@ name: SMC Signals
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -26,7 +26,7 @@ jobs:
         env:
           TG_TOKEN:   ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-          TF: "15m"
+          TF: "5m"
         run: python smc_bot.py
       - name: Zapisz stan
         run: |
