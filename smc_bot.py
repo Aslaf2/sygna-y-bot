@@ -1,5 +1,6 @@
 """
-SMC Signal Bot - darmowy, dziala 24/7 na GitHub Actions
+SMC / ICT 2-Agent Bot  —  OPCJA A (kod, dziala 24/7 na GitHub Actions, za darmo)
+Agent 1 (Skaut) skanuje 4 strategie ICT; Agent 2 (Walidator) zatwierdza.
 """
 
 import os
@@ -12,13 +13,15 @@ import yfinance as yf
 
 try:
     from zoneinfo import ZoneInfo
-    TZ = ZoneInfo("Europe/Warsaw")
+    TZ_PL = ZoneInfo("Europe/Warsaw")
+    TZ_NY = ZoneInfo("America/New_York")
 except Exception:
-    TZ = dt.timezone.utc
+    TZ_PL = dt.timezone.utc
+    TZ_NY = dt.timezone.utc
 
-# ===================== KONFIGURACJA =====================
 TOKEN   = os.getenv("TG_TOKEN", "")
 CHAT_ID = os.getenv("TG_CHAT_ID", "")
+DRY_RUN = os.getenv("DRY_RUN", "") == "1"
 
 SYMBOLS = [
     ("XAUUSD (zloto)",  "GC=F",     ["USD"]),
@@ -27,31 +30,30 @@ SYMBOLS = [
     ("US100 (Nasdaq)",  "^NDX",     ["USD"]),
 ]
 
-INTERVAL  = os.getenv("TF", "15m")
+INTERVAL  = os.getenv("TF", "5m")
 SWING_LEN = 5
 EMA_LEN   = 200
+EMA_FAST  = 50
 ATR_LEN   = 14
 SL_BUF    = 0.5
-RR_TP1    = 1.5
+RR_TP1    = 2.0
 RR_TP2    = 3.0
+FVG_LOOKBACK = 8
+APPROVE_SCORE = 3
 
-REQUIRE_FVG  = True
-FVG_LOOKBACK = 12
-SHOW_OB      = True
-
-REQUIRE_HTF  = True
 HTF_INTERVAL = "60m"
-HTF_EMA_LEN  = 50
 
 NEWS_URL        = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
 NEWS_WARN_MIN   = 40
 NEWS_ATTACH_MIN = 120
 NEWS_BLOCK_MIN  = 30
 STATE_FILE      = "state.json"
-# =======================================================
 
 
-def send_telegram(text: str):
+def send_telegram(text):
+    if DRY_RUN:
+        print("----- (DRY_RUN) -----\n" + text + "\n")
+        return
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     for chat in [c.strip() for c in CHAT_ID.split(",") if c.strip()]:
         try:
@@ -61,7 +63,7 @@ def send_telegram(text: str):
             print(f"Telegram blad ({chat}):", e)
 
 
-def load_state() -> dict:
+def load_state():
     try:
         with open(STATE_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -69,34 +71,36 @@ def load_state() -> dict:
         return {}
 
 
-def save_state(state: dict):
+def save_state(state):
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, indent=2)
 
 
+def now_pl():
+    return dt.datetime.now(TZ_PL).strftime("%d.%m.%Y %H:%M")
+
+
+def stopka():
+    return f"\n\U0001F552 {now_pl()} (czas PL)"
+
+
 def fetch_calendar():
     try:
-        r = requests.get(NEWS_URL, timeout=15,
-                         headers={"User-Agent": "Mozilla/5.0"})
+        r = requests.get(NEWS_URL, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
         r.raise_for_status()
         data = r.json()
     except Exception as e:
         print("Kalendarz niedostepny:", e)
         return []
-
     events = []
     for ev in data:
         try:
             when = dt.datetime.fromisoformat(ev["date"])
             if when.tzinfo is None:
                 when = when.replace(tzinfo=dt.timezone.utc)
-            events.append({
-                "title":   ev.get("title", ""),
-                "country": ev.get("country", ""),
-                "impact":  ev.get("impact", ""),
-                "when":    when,
-                "key":     f"{ev.get('country')}|{ev.get('title')}|{ev['date']}",
-            })
+            events.append({"title": ev.get("title", ""), "country": ev.get("country", ""),
+                           "impact": ev.get("impact", ""), "when": when,
+                           "key": f"{ev.get('country')}|{ev.get('title')}|{ev['date']}"})
         except Exception:
             continue
     return events
@@ -116,32 +120,22 @@ def high_impact_for(events, currencies, start_min, end_min, now=None):
     return sorted(out, key=lambda e: e["when"])
 
 
-def now_pl():
-    return dt.datetime.now(TZ).strftime("%d.%m.%Y %H:%M")
-
-
-def stopka():
-    return f"\n\U0001F552 {now_pl()} (czas PL)"
-
-
 def fmt_event(ev):
-    local = ev["when"].astimezone(TZ).strftime("%d.%m %H:%M")
+    local = ev["when"].astimezone(TZ_PL).strftime("%d.%m %H:%M")
     flag = "\U0001F534" if ev["impact"] == "High" else "\U0001F7E0"
     return f"{flag} {local} {ev['country']} - {ev['title']}"
 
 
 def daily_summary(events):
-    now = dt.datetime.now(TZ)
-    todays = [e for e in events
-              if e["when"].astimezone(TZ).date() == now.date()
+    now = dt.datetime.now(TZ_PL)
+    todays = [e for e in events if e["when"].astimezone(TZ_PL).date() == now.date()
               and e["impact"] in ("High", "Medium")]
     todays.sort(key=lambda e: e["when"])
     if not todays:
-        return "\U0001F4C5 Dzis brak waznych wydarzen makro. Spokojny dzien."
+        return "\U0001F4C5 Dzis brak waznych wydarzen makro. Spokojny dzien." + stopka()
     lines = "\n".join(fmt_event(e) for e in todays)
-    return ("\U0001F4C5 PLAN DNIA - wazne wydarzenia (uwaga na zmiennosc):\n"
-            "----------------------\n" + lines +
-            "\n\nHigh=duzy wplyw  Medium=sredni" + stopka())
+    return ("\U0001F4C5 PLAN DNIA - wazne wydarzenia:\n----------------------\n" +
+            lines + "\n\nHigh=duzy wplyw  Medium=sredni" + stopka())
 
 
 def atr(df, n):
@@ -150,9 +144,19 @@ def atr(df, n):
     return tr.rolling(n).mean()
 
 
-def has_fvg(highs, lows, i, direction):
-    start = max(2, i - FVG_LOOKBACK)
-    for j in range(start, i + 1):
+def find_swings(highs, lows, L):
+    sh, sl = [], []
+    n = len(highs)
+    for i in range(L, n - L):
+        if highs[i] == highs[i - L:i + L + 1].max():
+            sh.append((i, highs[i]))
+        if lows[i] == lows[i - L:i + L + 1].min():
+            sl.append((i, lows[i]))
+    return sh, sl
+
+
+def has_fvg(highs, lows, i, direction, lookback=FVG_LOOKBACK):
+    for j in range(max(2, i - lookback), i + 1):
         if direction == "LONG" and lows[j] > highs[j - 2]:
             return True
         if direction == "SHORT" and highs[j] < lows[j - 2]:
@@ -160,10 +164,18 @@ def has_fvg(highs, lows, i, direction):
     return False
 
 
-def find_ob(opens, closes, highs, lows, i, direction):
-    for k in range(1, 11):
+def new_fvg(highs, lows, i, direction):
+    if i < 2:
+        return False
+    if direction == "LONG":
+        return lows[i] > highs[i - 2]
+    return highs[i] < lows[i - 2]
+
+
+def last_ob(opens, closes, highs, lows, i, direction):
+    for k in range(1, 15):
         idx = i - k
-        if idx < 0:
+        if idx < 1:
             break
         if direction == "LONG" and closes[idx] < opens[idx]:
             return (lows[idx], highs[idx])
@@ -172,118 +184,181 @@ def find_ob(opens, closes, highs, lows, i, direction):
     return None
 
 
-def htf_trend(df_htf):
-    try:
-        d = df_htf.dropna().copy()
-        if len(d) < HTF_EMA_LEN + 2:
-            return 0
-        e = d["Close"].ewm(span=HTF_EMA_LEN, adjust=False).mean().iloc[-1]
-        c = d["Close"].iloc[-1]
-        return 1 if c > e else -1
-    except Exception:
-        return 0
+def in_killzone(now_ny):
+    t = now_ny.hour * 60 + now_ny.minute
+    zones = [(3 * 60, 4 * 60), (10 * 60, 11 * 60), (14 * 60, 15 * 60)]
+    return any(a <= t <= b for a, b in zones)
 
 
-def compute_signal(df, htf_dir=0):
+def build(side, entry, sl, strategy, reasons):
+    if side == "LONG":
+        risk = entry - sl
+        if risk <= 0:
+            return None
+        tp1, tp2 = entry + risk * RR_TP1, entry + risk * RR_TP2
+    else:
+        risk = sl - entry
+        if risk <= 0:
+            return None
+        tp1, tp2 = entry - risk * RR_TP1, entry - risk * RR_TP2
+    return {"side": side, "entry": entry, "sl": sl, "tp1": tp1, "tp2": tp2,
+            "strategy": strategy, "reasons": list(reasons)}
+
+
+def agent1_scout(df, now_ny):
     df = df.dropna().copy()
-    if len(df) < EMA_LEN + SWING_LEN + 5:
-        return None
-
+    if len(df) < EMA_LEN + SWING_LEN + 10:
+        return []
     df["EMA"] = df["Close"].ewm(span=EMA_LEN, adjust=False).mean()
     df["ATR"] = atr(df, ATR_LEN)
 
     opens = df["Open"].values
-    highs, lows, close = df["High"].values, df["Low"].values, df["Close"].values
+    highs, lows, closes = df["High"].values, df["Low"].values, df["Close"].values
     ema, atrv = df["EMA"].values, df["ATR"].values
-    L, n = SWING_LEN, len(df)
+    n = len(df)
+    i = n - 1
+    price = closes[i]
+    a = atrv[i]
+    trend = 1 if price > ema[i] else -1
 
-    last_ph = last_pl = None
-    trend = 0
-    signal = None
+    sh, sl_pts = find_swings(highs, lows, SWING_LEN)
+    last_sh = sh[-1][1] if sh else None
+    last_sl = sl_pts[-1][1] if sl_pts else None
+    prev_sh = sh[-2][1] if len(sh) >= 2 else last_sh
+    prev_sl = sl_pts[-2][1] if len(sl_pts) >= 2 else last_sl
 
-    def build(side, i):
-        if REQUIRE_HTF and htf_dir != 0:
-            if side == "LONG" and htf_dir != 1:
-                return None
-            if side == "SHORT" and htf_dir != -1:
-                return None
-        fvg_ok = has_fvg(highs, lows, i, side)
-        if REQUIRE_FVG and not fvg_ok:
-            return None
-        if side == "LONG":
-            entry = close[i]
-            base  = min(last_pl, lows[i]) if last_pl is not None else lows[i]
-            sl    = base - atrv[i] * SL_BUF
-            risk  = entry - sl
-            if risk <= 0:
-                return None
-            tp1, tp2 = entry + risk * RR_TP1, entry + risk * RR_TP2
-        else:
-            entry = close[i]
-            base  = max(last_ph, highs[i]) if last_ph is not None else highs[i]
-            sl    = base + atrv[i] * SL_BUF
-            risk  = sl - entry
-            if risk <= 0:
-                return None
-            tp1, tp2 = entry - risk * RR_TP1, entry - risk * RR_TP2
-        conf = ["Struktura: CHoCH", "Trend: EMA200"]
-        if REQUIRE_HTF and htf_dir != 0:
-            conf.append("HTF 1h: zgodny")
-        if fvg_ok:
-            conf.append("FVG: tak")
-        ob = find_ob(opens, close, highs, lows, i, side) if SHOW_OB else None
-        if ob:
-            conf.append("Order Block: tak")
-        return (side, entry, sl, tp1, tp2, i, conf)
+    cands = []
+    bull = closes[i] > opens[i]
+    bear = closes[i] < opens[i]
 
-    for i in range(L, n):
-        p = i - L
-        if p - L >= 0 and p + L < n:
-            if highs[p] == highs[p - L:p + L + 1].max():
-                last_ph = highs[p]
-            if lows[p] == lows[p - L:p + L + 1].min():
-                last_pl = lows[p]
+    if in_killzone(now_ny):
+        if trend == 1 and new_fvg(highs, lows, i, "LONG"):
+            base = last_sl if last_sl else lows[i]
+            c = build("LONG", price, base - a * SL_BUF, "Silver Bullet",
+                      ["killzone", "swiezy FVG byczy", "trend up"])
+            if c:
+                cands.append(c)
+        if trend == -1 and new_fvg(highs, lows, i, "SHORT"):
+            base = last_sh if last_sh else highs[i]
+            c = build("SHORT", price, base + a * SL_BUF, "Silver Bullet",
+                      ["killzone", "swiezy FVG nizdwiedzi", "trend down"])
+            if c:
+                cands.append(c)
 
-        if last_ph is not None and close[i] > last_ph and close[i - 1] <= last_ph:
-            if trend <= 0 and close[i] > ema[i]:
-                s = build("LONG", i)
-                if s:
-                    signal = s
-            trend = 1
+    if prev_sh is not None and highs[i] > prev_sh and price < prev_sh and bear:
+        c = build("SHORT", price, highs[i] + a * SL_BUF, "Liquidity Sweep",
+                  ["zebrano plynnosc (gora)", "odrzucenie"])
+        if c:
+            cands.append(c)
+    if prev_sl is not None and lows[i] < prev_sl and price > prev_sl and bull:
+        c = build("LONG", price, lows[i] - a * SL_BUF, "Liquidity Sweep",
+                  ["zebrano plynnosc (dol)", "odrzucenie"])
+        if c:
+            cands.append(c)
 
-        if last_pl is not None and close[i] < last_pl and close[i - 1] >= last_pl:
-            if trend >= 0 and close[i] < ema[i]:
-                s = build("SHORT", i)
-                if s:
-                    signal = s
-            trend = -1
+    if trend == 1:
+        ob = last_ob(opens, closes, highs, lows, i, "LONG")
+        if (ob and lows[i] <= ob[1] and lows[i - 1] > ob[1] and bull
+                and has_fvg(highs, lows, i, "LONG")):
+            c = build("LONG", price, ob[0] - a * SL_BUF, "Order Block + FVG",
+                      ["pierwszy dotyk OB", "FVG byczy", "trend up"])
+            if c:
+                cands.append(c)
+    if trend == -1:
+        ob = last_ob(opens, closes, highs, lows, i, "SHORT")
+        if (ob and highs[i] >= ob[0] and highs[i - 1] < ob[0] and bear
+                and has_fvg(highs, lows, i, "SHORT")):
+            c = build("SHORT", price, ob[1] + a * SL_BUF, "Order Block + FVG",
+                      ["pierwszy dotyk OB", "FVG nizdwiedzi", "trend down"])
+            if c:
+                cands.append(c)
 
-    if signal and signal[5] == n - 1:
-        return (*signal[:6], signal[6], df.index[-1].isoformat())
-    return None
+    if last_sh is not None and last_sl is not None:
+        prev_price = closes[i - 1]
+        if trend == 1 and last_sl < last_sh:
+            leg = last_sh - last_sl
+            lo, hi = last_sh - leg * 0.79, last_sh - leg * 0.62
+            if leg > 0 and lo <= price <= hi and prev_price > hi and bull:
+                c = build("LONG", price, last_sl - a * SL_BUF, "OTE",
+                          ["strefa 62-79%", "reakcja bycza", "trend up"])
+                if c:
+                    cands.append(c)
+        if trend == -1 and last_sh > last_sl:
+            leg = last_sh - last_sl
+            lo, hi = last_sl + leg * 0.62, last_sl + leg * 0.79
+            if leg > 0 and lo <= price <= hi and prev_price < lo and bear:
+                c = build("SHORT", price, last_sh + a * SL_BUF, "OTE",
+                          ["strefa 62-79%", "reakcja nizdwiedzia", "trend down"])
+                if c:
+                    cands.append(c)
+
+    kz = in_killzone(now_ny)
+    side_count = {}
+    for c in cands:
+        side_count[c["side"]] = side_count.get(c["side"], 0) + 1
+    for c in cands:
+        c["kz"] = kz
+        c["fvg_fresh"] = new_fvg(highs, lows, i, c["side"])
+        c["n_side"] = side_count[c["side"]]
+
+    return cands, df.index[-1].isoformat()
 
 
-def fmt_signal(side, name, tf, entry, sl, tp1, tp2, conf, news):
-    emoji = "\U0001F7E2 LONG" if side == "LONG" else "\U0001F534 SHORT"
-    d = 5 if abs(entry) < 10 else 2
-    msg = (f"{emoji}  {name}  ({tf})\n"
+def htf_trend(dfh):
+    try:
+        d = dfh.dropna()
+        if len(d) < 52:
+            return 0
+        e = d["Close"].ewm(span=EMA_FAST, adjust=False).mean().iloc[-1]
+        return 1 if d["Close"].iloc[-1] > e else -1
+    except Exception:
+        return 0
+
+
+def agent2_validate(cand, hdir, events, ccys, now):
+    score, why = 0, []
+    blockers = [e for e in high_impact_for(events, ccys, 0, NEWS_BLOCK_MIN, now)
+                if e["impact"] == "High"]
+    if blockers:
+        return (False, 0, ["blokada: dane makro za chwile"], blockers[0])
+    if hdir != 0 and ((cand["side"] == "LONG" and hdir == 1) or
+                      (cand["side"] == "SHORT" and hdir == -1)):
+        score += 1
+        why.append("zgodne z trendem 1h")
+    if cand.get("kz"):
+        score += 1
+        why.append("killzone")
+    if cand.get("fvg_fresh"):
+        score += 1
+        why.append("swiezy FVG")
+    if cand.get("n_side", 1) >= 2:
+        score += 1
+        why.append("zbieznosc strategii")
+    return (score >= APPROVE_SCORE, score, why, None)
+
+
+def fmt_signal(name, cand, score, why, news):
+    emoji = "\U0001F7E2 LONG" if cand["side"] == "LONG" else "\U0001F534 SHORT"
+    e = cand["entry"]
+    d = 5 if abs(e) < 10 else 2
+    msg = (f"{emoji}  {name}\n"
+           f"\U0001F9E0 Strategia: {cand['strategy']}\n"
            f"----------------------\n"
-           f"Wejscie: {entry:.{d}f}\n"
-           f"SL: {sl:.{d}f}\n"
-           f"TP1: {tp1:.{d}f}\n"
-           f"TP2: {tp2:.{d}f}\n"
-           f"RR: 1:{RR_TP1} / 1:{RR_TP2}\n"
-           f"Potwierdzenia: " + ", ".join(conf))
+           f"Wejscie: {cand['entry']:.{d}f}\n"
+           f"SL: {cand['sl']:.{d}f}\n"
+           f"TP1: {cand['tp1']:.{d}f}\n"
+           f"TP2: {cand['tp2']:.{d}f}\n"
+           f"\U00002705 Agent2 ({score} pkt): " + ", ".join(why) + "\n"
+           f"\U0001F50E Agent1: " + ", ".join(cand["reasons"]))
     if news:
-        msg += "\n\n\u26A0\uFE0F UWAGA, wkrotce wazne wydarzenia:\n" + \
-               "\n".join(fmt_event(e) for e in news) + \
-               "\n(rozwaz mniejsze ryzyko lub czekaj po danych)"
+        msg += "\n\n\U000026A0 Wkrotce wazne wydarzenia:\n" + \
+               "\n".join(fmt_event(x) for x in news)
     return msg + stopka()
 
 
 def main():
-    if not TOKEN or not CHAT_ID:
-        print("Brak TG_TOKEN / TG_CHAT_ID (ustaw jako GitHub Secrets).")
+    if not DRY_RUN and (not TOKEN or not CHAT_ID):
+        print("Brak TG_TOKEN / TG_CHAT_ID.")
         return
 
     state = load_state()
@@ -291,69 +366,70 @@ def main():
     changed = False
     events = fetch_calendar()
     now = dt.datetime.now(dt.timezone.utc)
+    now_ny = dt.datetime.now(TZ_NY)
 
-    today = dt.datetime.now(TZ).date().isoformat()
-    if state.get("daily_summary") != today and dt.datetime.now(TZ).hour >= 7:
+    today = dt.datetime.now(TZ_PL).date().isoformat()
+    if state.get("daily_summary") != today and dt.datetime.now(TZ_PL).hour >= 7:
         send_telegram(daily_summary(events))
         state["daily_summary"] = today
         changed = True
 
-    all_ccy = sorted({c for _, _, ccys in SYMBOLS for c in ccys})
+    all_ccy = sorted({c for _, _, cc in SYMBOLS for c in cc})
     for ev in high_impact_for(events, all_ccy, 0, NEWS_WARN_MIN, now):
         if ev["key"] in state["sent_events"]:
             continue
         mins = int((ev["when"] - now).total_seconds() / 60)
-        send_telegram(f"\u26A0\uFE0F ZA ~{mins} MIN - wazne wydarzenie!\n"
-                      f"{fmt_event(ev)}\n"
-                      f"Mozliwa duza zmiennosc - ostroznie z wejsciami, szczegolnie na zlocie." + stopka())
+        send_telegram(f"\U000026A0 ZA ~{mins} MIN - wazne wydarzenie!\n{fmt_event(ev)}\n"
+                      f"Mozliwa duza zmiennosc - ostroznie, zwlaszcza na zlocie." + stopka())
         state["sent_events"].append(ev["key"])
         changed = True
 
     for name, sym, ccys in SYMBOLS:
         try:
-            df = yf.download(sym, period="20d", interval=INTERVAL,
+            df = yf.download(sym, period="10d", interval=INTERVAL,
                              progress=False, auto_adjust=False)
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.get_level_values(0)
             if df.empty:
-                print(f"{name}: brak danych")
-                continue
+                print(f"{name}: brak danych"); continue
 
-            hdir = 0
-            if REQUIRE_HTF:
-                dfh = yf.download(sym, period="60d", interval=HTF_INTERVAL,
-                                  progress=False, auto_adjust=False)
-                if isinstance(dfh.columns, pd.MultiIndex):
-                    dfh.columns = dfh.columns.get_level_values(0)
-                hdir = htf_trend(dfh)
+            res = agent1_scout(df, now_ny)
+            if not res or not res[0]:
+                print(f"{name}: Agent1 - brak kandydatow"); continue
+            cands, bar_time = res
 
-            sig = compute_signal(df, hdir)
-            if sig is None:
-                print(f"{name}: brak sygnalu")
-                continue
-
-            side, entry, sl, tp1, tp2, _idx, conf, bar_time = sig
             if state.get(sym) == bar_time:
-                print(f"{name}: juz wyslany")
+                print(f"{name}: juz wyslany"); continue
+
+            dfh = yf.download(sym, period="60d", interval=HTF_INTERVAL,
+                              progress=False, auto_adjust=False)
+            if isinstance(dfh.columns, pd.MultiIndex):
+                dfh.columns = dfh.columns.get_level_values(0)
+            hdir = htf_trend(dfh)
+
+            best = None
+            for c in cands:
+                ok, score, why, blocker = agent2_validate(c, hdir, events, ccys, now)
+                if blocker is not None:
+                    mins = int((blocker["when"] - now).total_seconds() / 60)
+                    send_telegram(f"\U000023F8 {name}: setup {c['strategy']} odrzucony.\n"
+                                  f"Wazne dane za ~{mins} min: {fmt_event(blocker)}" + stopka())
+                    state[sym] = bar_time; changed = True
+                    best = "blocked"; break
+                if ok and (best is None or score > best[1]):
+                    best = (c, score, why)
+
+            if best is None or best == "blocked":
+                if best is None:
+                    print(f"{name}: Agent2 odrzucil wszystkich")
                 continue
 
-            blockers = [e for e in high_impact_for(events, ccys, 0, NEWS_BLOCK_MIN, now)
-                        if e["impact"] == "High"]
-            if blockers:
-                mins = int((blockers[0]["when"] - now).total_seconds() / 60)
-                send_telegram(f"\u23F8 Sygnal {side} - {name} WSTRZYMANY.\n"
-                              f"Wazne dane za ~{mins} min: {fmt_event(blockers[0])}\n"
-                              f"Lepiej poczekac na reakcje rynku po publikacji." + stopka())
-                state[sym] = bar_time
-                changed = True
-                print(f"{name}: wstrzymano (news)")
-                continue
-
+            c, score, why = best
             news = high_impact_for(events, ccys, 0, NEWS_ATTACH_MIN, now)
-            send_telegram(fmt_signal(side, name, INTERVAL, entry, sl, tp1, tp2, conf, news))
+            send_telegram(fmt_signal(name, c, score, why, news))
             state[sym] = bar_time
             changed = True
-            print(f"{name}: WYSLANO {side}")
+            print(f"{name}: WYSLANO {c['side']} ({c['strategy']})")
 
         except Exception as e:
             print(f"{name}: blad -> {e}")
