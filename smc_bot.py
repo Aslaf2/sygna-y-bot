@@ -1,6 +1,7 @@
 """
-SMC / ICT 2-Agent Bot  —  OPCJA A (kod, dziala 24/7 na GitHub Actions, za darmo)
+SMC / ICT 2-Agent Bot — OPCJA A (kod, dziala 24/7 na GitHub Actions).
 Agent 1 (Skaut) skanuje 4 strategie ICT; Agent 2 (Walidator) zatwierdza.
+Skanuje ostatnie ZAMKNIETE swiece (odpornosc na opoznienia harmonogramu).
 """
 
 import os
@@ -40,6 +41,8 @@ RR_TP1    = 2.0
 RR_TP2    = 3.0
 FVG_LOOKBACK = 8
 APPROVE_SCORE = 3
+SCAN_BARS    = 6
+COOLDOWN_MIN = 20
 
 HTF_INTERVAL = "60m"
 
@@ -363,6 +366,8 @@ def main():
 
     state = load_state()
     state.setdefault("sent_events", [])
+    sent_bars = state.setdefault("sent_bars", {})
+    last_send = state.setdefault("last_send", {})
     changed = False
     events = fetch_calendar()
     now = dt.datetime.now(dt.timezone.utc)
@@ -390,44 +395,62 @@ def main():
                              progress=False, auto_adjust=False)
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.get_level_values(0)
-            if df.empty:
+            if df.empty or len(df) < EMA_LEN + SWING_LEN + 12:
                 print(f"{name}: brak danych"); continue
 
-            res = agent1_scout(df, now_ny)
-            if not res or not res[0]:
-                print(f"{name}: Agent1 - brak kandydatow"); continue
-            cands, bar_time = res
+            li = last_send.get(sym)
+            if li:
+                try:
+                    if (now - dt.datetime.fromisoformat(li)).total_seconds() < COOLDOWN_MIN * 60:
+                        print(f"{name}: cooldown"); continue
+                except Exception:
+                    pass
 
-            if state.get(sym) == bar_time:
-                print(f"{name}: juz wyslany"); continue
-
+            dff = df.iloc[:-1]
             dfh = yf.download(sym, period="60d", interval=HTF_INTERVAL,
                               progress=False, auto_adjust=False)
             if isinstance(dfh.columns, pd.MultiIndex):
                 dfh.columns = dfh.columns.get_level_values(0)
             hdir = htf_trend(dfh)
+            seen = sent_bars.get(sym, [])
 
-            best = None
-            for c in cands:
-                ok, score, why, blocker = agent2_validate(c, hdir, events, ccys, now)
-                if blocker is not None:
-                    mins = int((blocker["when"] - now).total_seconds() / 60)
-                    send_telegram(f"\U000023F8 {name}: setup {c['strategy']} odrzucony.\n"
-                                  f"Wazne dane za ~{mins} min: {fmt_event(blocker)}" + stopka())
-                    state[sym] = bar_time; changed = True
-                    best = "blocked"; break
-                if ok and (best is None or score > best[1]):
-                    best = (c, score, why)
+            chosen = None
+            for k in range(1, SCAN_BARS + 1):
+                end = len(dff) - k
+                if end < EMA_LEN + SWING_LEN + 10:
+                    break
+                sub = dff.iloc[:end + 1]
+                bar_time = sub.index[-1].isoformat()
+                if bar_time in seen:
+                    continue
+                ts = sub.index[-1].to_pydatetime()
+                try:
+                    nyt = ts.astimezone(TZ_NY)
+                except Exception:
+                    nyt = now_ny
+                res = agent1_scout(sub, nyt)
+                if not res or not res[0]:
+                    continue
+                best = None
+                for c in res[0]:
+                    ok, score, why, blocker = agent2_validate(c, hdir, events, ccys, now)
+                    if blocker is not None:
+                        best = None; break
+                    if ok and (best is None or score > best[1]):
+                        best = (c, score, why)
+                if best:
+                    chosen = (best, bar_time)
+                    break
 
-            if best is None or best == "blocked":
-                if best is None:
-                    print(f"{name}: Agent2 odrzucil wszystkich")
-                continue
+            if not chosen:
+                print(f"{name}: brak nowego sygnalu"); continue
 
-            c, score, why = best
+            (c, score, why), bar_time = chosen
             news = high_impact_for(events, ccys, 0, NEWS_ATTACH_MIN, now)
             send_telegram(fmt_signal(name, c, score, why, news))
-            state[sym] = bar_time
+            seen.append(bar_time)
+            sent_bars[sym] = seen[-120:]
+            last_send[sym] = now.isoformat()
             changed = True
             print(f"{name}: WYSLANO {c['side']} ({c['strategy']})")
 
