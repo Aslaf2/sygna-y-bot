@@ -1,5 +1,7 @@
 {
-  "sent_events": [],
+  "sent_events": [
+    "USD|President Trump Speaks|2026-06-23T14:05:00-04:00"
+  ],
   "daily_summary": "2026-06-23",
   "sent_bars": {},
   "last_send": {}
