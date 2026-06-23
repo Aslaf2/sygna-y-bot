@@ -1,11 +1,10 @@
 """
-SMC / ICT 2-Agent Bot — OPCJA A (kod, dziala 24/7 na GitHub Actions).
-Agent 1 (Skaut) skanuje 4 strategie ICT; Agent 2 (Walidator) zatwierdza.
-Skanuje ostatnie ZAMKNIETE swiece (odpornosc na opoznienia harmonogramu).
+SMC / ICT 2-Agent Bot — OPCJA A. Odporny na rate-limit Yahoo (mniej pobran + retry).
 """
 
 import os
 import json
+import time
 import datetime as dt
 
 import requests
@@ -43,8 +42,6 @@ FVG_LOOKBACK = 8
 APPROVE_SCORE = 3
 SCAN_BARS    = 6
 COOLDOWN_MIN = 20
-
-HTF_INTERVAL = "60m"
 
 NEWS_URL        = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
 NEWS_WARN_MIN   = 40
@@ -139,6 +136,27 @@ def daily_summary(events):
     lines = "\n".join(fmt_event(e) for e in todays)
     return ("\U0001F4C5 PLAN DNIA - wazne wydarzenia:\n----------------------\n" +
             lines + "\n\nHigh=duzy wplyw  Medium=sredni" + stopka())
+
+
+def dl(sym, period, interval, retries=3):
+    for attempt in range(retries):
+        try:
+            df = yf.download(sym, period=period, interval=interval,
+                             progress=False, auto_adjust=False, threads=False)
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            if not df.empty:
+                return df
+        except Exception as e:
+            print(f"  dl {sym} proba {attempt+1}: {e}")
+        time.sleep(3 * (attempt + 1))
+    return pd.DataFrame()
+
+
+def htf_from_5m(df):
+    h = df[["Open", "High", "Low", "Close"]].resample("1h").agg(
+        {"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna()
+    return htf_trend(h)
 
 
 def atr(df, n):
@@ -391,13 +409,6 @@ def main():
 
     for name, sym, ccys in SYMBOLS:
         try:
-            df = yf.download(sym, period="10d", interval=INTERVAL,
-                             progress=False, auto_adjust=False)
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            if df.empty or len(df) < EMA_LEN + SWING_LEN + 12:
-                print(f"{name}: brak danych"); continue
-
             li = last_send.get(sym)
             if li:
                 try:
@@ -406,13 +417,14 @@ def main():
                 except Exception:
                     pass
 
+            df = dl(sym, "10d", INTERVAL)
+            if df.empty or len(df) < EMA_LEN + SWING_LEN + 12:
+                print(f"{name}: brak danych (Yahoo)"); time.sleep(2); continue
+
             dff = df.iloc[:-1]
-            dfh = yf.download(sym, period="60d", interval=HTF_INTERVAL,
-                              progress=False, auto_adjust=False)
-            if isinstance(dfh.columns, pd.MultiIndex):
-                dfh.columns = dfh.columns.get_level_values(0)
-            hdir = htf_trend(dfh)
+            hdir = htf_from_5m(df)
             seen = sent_bars.get(sym, [])
+            time.sleep(1)
 
             chosen = None
             for k in range(1, SCAN_BARS + 1):
