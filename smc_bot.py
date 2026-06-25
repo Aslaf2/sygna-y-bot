@@ -30,6 +30,16 @@ SYMBOLS = [
     ("US100 (Nasdaq)",  "^NDX",     ["USD"]),
 ]
 
+# Zapasowe zrodlo danych (Twelve Data) - dziala z serwerow chmurowych, gdy Yahoo
+# blokuje GitHub Actions. Wlacza sie tylko gdy ustawiony sekret TD_KEY.
+TD_KEY = os.getenv("TD_KEY", "")
+TD_MAP = {
+    "GC=F":     "XAU/USD",
+    "SI=F":     "XAG/USD",
+    "EURUSD=X": "EUR/USD",
+    "^NDX":     "NDX",
+}
+
 INTERVAL  = os.getenv("TF", "5m")
 SWING_LEN = 5
 EMA_LEN   = 200
@@ -150,7 +160,41 @@ def dl(sym, period, interval, retries=3):
         except Exception as e:
             print(f"  dl {sym} proba {attempt+1}: {e}")
         time.sleep(3 * (attempt + 1))
-    return pd.DataFrame()
+    td = dl_td(sym, interval)
+    if not td.empty:
+        print(f"  {sym}: uzyto Twelve Data (Yahoo pusty)")
+    return td
+
+
+def dl_td(sym, interval):
+    """Awaryjne zrodlo: Twelve Data. Zwraca DataFrame jak Yahoo (Open/High/Low/Close,
+    indeks UTC). Pusty DF, gdy brak klucza TD_KEY lub brak danych."""
+    if not TD_KEY:
+        return pd.DataFrame()
+    tdsym = TD_MAP.get(sym)
+    if not tdsym:
+        return pd.DataFrame()
+    td_int = {"5m": "5min", "15m": "15min", "60m": "1h", "1h": "1h"}.get(interval, "5min")
+    try:
+        r = requests.get("https://api.twelvedata.com/time_series",
+                         params={"symbol": tdsym, "interval": td_int, "outputsize": 5000,
+                                 "apikey": TD_KEY, "format": "JSON", "timezone": "UTC"},
+                         timeout=20)
+        j = r.json()
+        if not isinstance(j, dict) or "values" not in j:
+            print(f"  TwelveData {tdsym}: {j.get('message', j) if isinstance(j, dict) else j}")
+            return pd.DataFrame()
+        df = pd.DataFrame(j["values"])
+        df["datetime"] = pd.to_datetime(df["datetime"], utc=True)
+        df = df.set_index("datetime").sort_index()
+        df = df.rename(columns={"open": "Open", "high": "High", "low": "Low", "close": "Close"})
+        for col in ("Open", "High", "Low", "Close"):
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        df["Volume"] = 0
+        return df[["Open", "High", "Low", "Close", "Volume"]].dropna()
+    except Exception as e:
+        print(f"  TwelveData {tdsym} blad: {e}")
+        return pd.DataFrame()
 
 
 def htf_from_5m(df):
@@ -407,6 +451,7 @@ def main():
         state["sent_events"].append(ev["key"])
         changed = True
 
+    data_fail = []
     for name, sym, ccys in SYMBOLS:
         try:
             li = last_send.get(sym)
@@ -419,7 +464,8 @@ def main():
 
             df = dl(sym, "10d", INTERVAL)
             if df.empty or len(df) < EMA_LEN + SWING_LEN + 12:
-                print(f"{name}: brak danych (Yahoo)"); time.sleep(2); continue
+                print(f"{name}: brak danych (Yahoo)"); data_fail.append(name)
+                time.sleep(2); continue
 
             dff = df.iloc[:-1]
             hdir = htf_from_5m(df)
@@ -468,6 +514,26 @@ def main():
 
         except Exception as e:
             print(f"{name}: blad -> {e}")
+
+    # ALARM: brak danych rynkowych (np. Yahoo blokuje chmure) - zeby nie bylo
+    # "zielono, ale niemo". Wysylany najwyzej raz na 3h.
+    if data_fail:
+        last_alert = state.get("data_alert")
+        send_alert = True
+        if last_alert:
+            try:
+                if (now - dt.datetime.fromisoformat(last_alert)).total_seconds() < 3 * 3600:
+                    send_alert = False
+            except Exception:
+                pass
+        if send_alert:
+            src = "Twelve Data (zapas)" if TD_KEY else "tylko Yahoo"
+            send_telegram("\U000026A0 DIAGNOSTYKA: brak danych rynkowych dla: "
+                          + ", ".join(data_fail) + f".\nZrodlo: {src}. "
+                          "Mozliwa blokada Yahoo w chmurze - sygnaly wstrzymane do powrotu danych."
+                          + stopka())
+            state["data_alert"] = now.isoformat()
+            changed = True
 
     state["sent_events"] = state["sent_events"][-100:]
     if changed:
