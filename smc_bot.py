@@ -421,40 +421,7 @@ def fmt_signal(name, cand, score, why, news):
     return msg + stopka()
 
 
-def diag():
-    """TYMCZASOWE: pokazuje czym widzi chmura dane i ile sygnalow by zatwierdzila."""
-    import datetime as _dt
-    now = _dt.datetime.now(_dt.timezone.utc)
-    events = []  # bez blokad newsowych, czysta logika
-    for name, sym, ccys in SYMBOLS:
-        df = dl(sym, "10d", INTERVAL)
-        if df.empty:
-            print(f"DIAG {name}: BRAK DANYCH"); continue
-        dff = df.iloc[:-1]
-        try:
-            hdir = htf_from_5m(df)
-        except Exception as e:
-            hdir = f"ERR:{e}"
-        appr = 0; cand = 0; bystrat = {}
-        start = EMA_LEN + SWING_LEN + 10
-        for end in range(start, len(dff)):
-            sub = dff.iloc[:end + 1]
-            ts = sub.index[-1].to_pydatetime().astimezone(TZ_NY)
-            res = agent1_scout(sub, ts)
-            if not res or not res[0]:
-                continue
-            for c in res[0]:
-                cand += 1
-                ok, sc, why, bl = agent2_validate(c, hdir if isinstance(hdir, int) else 0, events, ccys, now)
-                if ok:
-                    appr += 1; bystrat[c['strategy']] = bystrat.get(c['strategy'], 0) + 1
-        print(f"DIAG {name}: bars={len(df)} last={df.index[-1]} hdir={hdir} "
-              f"kandydaci={cand} ZATWIERDZONE={appr} {bystrat}")
-
-
 def main():
-    if os.getenv("DIAG") == "1":
-        diag(); return
     if not DRY_RUN and (not TOKEN or not CHAT_ID):
         print("Brak TG_TOKEN / TG_CHAT_ID.")
         return
