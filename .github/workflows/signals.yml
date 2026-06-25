@@ -27,6 +27,7 @@ jobs:
           TG_TOKEN:   ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           TF: "5m"
+          DIAG: "1"
         run: python smc_bot.py
       - name: Zapisz stan
         run: |
