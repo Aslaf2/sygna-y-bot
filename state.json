@@ -4,6 +4,12 @@
     "USD|President Trump Speaks|2026-06-26T13:30:00-04:00"
   ],
   "daily_summary": "2026-06-26",
-  "sent_bars": {},
-  "last_send": {}
+  "sent_bars": {
+    "^NDX": [
+      "2026-06-26T14:00:00-04:00"
+    ]
+  },
+  "last_send": {
+    "^NDX": "2026-06-26T18:06:28.367813+00:00"
+  }
 }
