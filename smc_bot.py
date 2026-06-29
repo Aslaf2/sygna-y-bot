@@ -3,6 +3,7 @@ SMC / ICT 2-Agent Bot — OPCJA A. Odporny na rate-limit Yahoo (mniej pobran + r
 """
 
 import os
+import csv
 import json
 import time
 import datetime as dt
@@ -58,6 +59,7 @@ NEWS_WARN_MIN   = 40
 NEWS_ATTACH_MIN = 120
 NEWS_BLOCK_MIN  = 30
 STATE_FILE      = "state.json"
+LOG_FILE        = "sygnaly_log.csv"   # historia WYSLANYCH sygnalow (do Excela z wynikami)
 
 
 def send_telegram(text):
@@ -92,6 +94,26 @@ def now_pl():
 
 def stopka():
     return f"\n\U0001F552 {now_pl()} (czas PL)"
+
+
+def log_signal(name, cand, score, bar_time):
+    """Dopisuje WYSLANY sygnal do CSV (do pozniejszego Excela z wynikami).
+    TP3 = 4R liczone tu (wiadomosc pokazuje TP1/TP2, log trzyma tez TP3)."""
+    risk = abs(cand["entry"] - cand["sl"])
+    tp3 = cand["entry"] + (4 * risk if cand["side"] == "LONG" else -4 * risk)
+    nowe = not os.path.exists(LOG_FILE)
+    try:
+        with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            if nowe:
+                w.writerow(["data_pl", "data_utc", "instrument", "strona", "strategia",
+                            "score", "entry", "sl", "tp1", "tp2", "tp3", "swieca", "powody"])
+            w.writerow([now_pl(), dt.datetime.now(dt.timezone.utc).isoformat(),
+                        name, cand["side"], cand["strategy"], score,
+                        cand["entry"], cand["sl"], cand["tp1"], cand["tp2"], tp3,
+                        bar_time, "; ".join(cand.get("reasons", []))])
+    except Exception as e:
+        print("log_signal blad:", e)
 
 
 def fetch_calendar():
@@ -506,6 +528,7 @@ def main():
             (c, score, why), bar_time = chosen
             news = high_impact_for(events, ccys, 0, NEWS_ATTACH_MIN, now)
             send_telegram(fmt_signal(name, c, score, why, news))
+            log_signal(name, c, score, bar_time)
             seen.append(bar_time)
             sent_bars[sym] = seen[-120:]
             last_send[sym] = now.isoformat()

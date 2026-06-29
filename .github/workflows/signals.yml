@@ -1,23 +1,23 @@
 name: SMC Signals
 
-# Repo publiczne = nielimitowane minuty. Zamiast liczyc na cron "*/5" (GitHub go
-# dlawi i odpala 2-3x/dzien), startujemy job przy kazdej killzone i PETLIMY w nim
-# co 5 min przez cale okno - niezaleznie od opoznien harmonogramu GitHuba.
-# Killzone (czas NY): London 03-04, NY AM 10-11, NY PM 14-15.
-# W UTC (lato/EDT): 07-08, 14-15, 18-19. Startujemy ~10 min wczesniej + backup.
+# Repo publiczne = nielimitowane minuty. Harmonogram GitHuba bywa dostarczany z
+# WIELOGODZINNYM opoznieniem lub wcale, wiec NIE liczymy na punktualnosc: kazdy
+# trigger uruchamia DLUGA petle (~3h, skan co 5 min), a triggery sa rozlozone co
+# ~2.5h przez caly dzien handlowy. Dzieki temu nawet rzadkie/spoznione starty i
+# tak pokrywaja killzony. Killzone UTC (lato): London 07-08, NY AM 14-15, NY PM 18-19.
 on:
   schedule:
-    - cron: "50 6 * * 1-5"    # London KZ (07-08 UTC) - primary
-    - cron: "15 7 * * 1-5"    # London KZ - backup gdyby primary przepadl
-    - cron: "50 13 * * 1-5"   # NY AM KZ (14-15 UTC) - primary
-    - cron: "15 14 * * 1-5"   # NY AM KZ - backup
-    - cron: "50 17 * * 1-5"   # NY PM KZ (18-19 UTC) - primary
-    - cron: "15 18 * * 1-5"   # NY PM KZ - backup
+    - cron: "20 6 * * 1-5"
+    - cron: "50 8 * * 1-5"
+    - cron: "20 11 * * 1-5"
+    - cron: "50 13 * * 1-5"
+    - cron: "20 16 * * 1-5"
+    - cron: "50 18 * * 1-5"
   workflow_dispatch:
     inputs:
       petla_min:
         description: "Ile minut petli (0 = jeden skan, do testu)"
-        default: "75"
+        default: "180"
 
 permissions:
   contents: write
@@ -47,15 +47,15 @@ jobs:
           git config user.name "smc-bot"
           git config user.email "bot@users.noreply.github.com"
           MIN="${{ github.event.inputs.petla_min }}"
-          [ -z "$MIN" ] && MIN=75
+          [ -z "$MIN" ] && MIN=180
           KONIEC=$(( $(date +%s) + MIN*60 ))
           while true; do
             echo "--- skan $(date -u +%H:%M:%S) UTC (petla do +${MIN}min) ---"
             python smc_bot.py
             # zapisz stan tylko gdy sie zmienil (dedup przetrwa nawet gdy job sie urwie)
-            git add state.json
+            git add state.json sygnaly_log.csv
             if ! git diff --cached --quiet; then
-              git commit -m "update state" && git push || echo "push nieudany"
+              git commit -m "update state + log sygnalow" && git push || echo "push nieudany"
             fi
             [ "$(date +%s)" -ge "$KONIEC" ] && break
             sleep 300
