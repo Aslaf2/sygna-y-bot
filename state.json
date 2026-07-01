@@ -5,7 +5,7 @@
     "USD|CB Consumer Confidence|2026-06-30T10:00:00-04:00",
     "USD|JOLTS Job Openings|2026-06-30T10:00:00-04:00"
   ],
-  "daily_summary": "2026-06-30",
+  "daily_summary": "2026-07-01",
   "sent_bars": {
     "^NDX": [
       "2026-06-26T14:00:00-04:00",
