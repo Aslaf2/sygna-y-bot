@@ -65,7 +65,10 @@ RR_TP1    = 2.0
 RR_TP2    = 3.0
 FVG_LOOKBACK = 8
 APPROVE_SCORE = 3
-SCAN_BARS    = 6
+# 2 swiece = sygnal maks. ~10 min od zamkniecia swiecy sygnalowej. Dowod (log
+# 43 sygnalow live): przy 6 swiecach 1/3 sygnalow szla >15 min po fakcie
+# (cena wejscia juz nieaktualna). Bot petli sie co 5 min, wiec 2 wystarcza.
+SCAN_BARS    = 2
 COOLDOWN_MIN = 20
 
 NEWS_URL        = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
