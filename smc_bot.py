@@ -41,6 +41,20 @@ TD_MAP = {
     "^NDX":     "NDX",
 }
 
+# Prog potwierdzen per instrument. Dowod (backtest 30 dni, 305 sygnalow):
+# EURUSD na progu 3 ma przewage ~0R (traci na spreadzie); wylaczenie go lub
+# prog 4 podnosi przewage calosci z +0.15R do +0.23R. Reszta zostaje na 3.
+MIN_SCORE = {"EURUSD=X": 4}
+
+# TradingView - ocena techniczna (5m) doklejana do sygnalu i logowana,
+# zeby z czasem zmierzyc, czy zgodnosc z TV poprawia wyniki.
+TV_TA_MAP = {
+    "GC=F":     ("XAUUSD", "OANDA",  "cfd"),
+    "SI=F":     ("SILVER", "TVC",    "cfd"),
+    "EURUSD=X": ("EURUSD", "FX_IDC", "forex"),
+    "^NDX":     ("NDX",    "NASDAQ", "america"),
+}
+
 INTERVAL  = os.getenv("TF", "5m")
 SWING_LEN = 5
 EMA_LEN   = 200
@@ -96,7 +110,23 @@ def stopka():
     return f"\n\U0001F552 {now_pl()} (czas PL)"
 
 
-def log_signal(name, cand, score, bar_time):
+def tv_rating(sym):
+    """Ocena TradingView (interwal 5m), np. 'BUY (14/3/9)'. None gdy niedostepna."""
+    m = TV_TA_MAP.get(sym)
+    if not m:
+        return None
+    try:
+        from tradingview_ta import TA_Handler, Interval
+        a = TA_Handler(symbol=m[0], exchange=m[1], screener=m[2],
+                       interval=Interval.INTERVAL_5_MINUTES).get_analysis()
+        s = a.summary
+        return f"{s['RECOMMENDATION']} ({s['BUY']}/{s['SELL']}/{s['NEUTRAL']})"
+    except Exception as e:
+        print(f"  TradingView {m[0]}: {e}")
+        return None
+
+
+def log_signal(name, cand, score, bar_time, tv=None):
     """Dopisuje WYSLANY sygnal do CSV (do pozniejszego Excela z wynikami).
     TP3 = 4R liczone tu (wiadomosc pokazuje TP1/TP2, log trzyma tez TP3)."""
     risk = abs(cand["entry"] - cand["sl"])
@@ -107,11 +137,12 @@ def log_signal(name, cand, score, bar_time):
             w = csv.writer(f)
             if nowe:
                 w.writerow(["data_pl", "data_utc", "instrument", "strona", "strategia",
-                            "score", "entry", "sl", "tp1", "tp2", "tp3", "swieca", "powody"])
+                            "score", "entry", "sl", "tp1", "tp2", "tp3", "swieca",
+                            "powody", "tv"])
             w.writerow([now_pl(), dt.datetime.now(dt.timezone.utc).isoformat(),
                         name, cand["side"], cand["strategy"], score,
                         cand["entry"], cand["sl"], cand["tp1"], cand["tp2"], tp3,
-                        bar_time, "; ".join(cand.get("reasons", []))])
+                        bar_time, "; ".join(cand.get("reasons", [])), tv or ""])
     except Exception as e:
         print("log_signal blad:", e)
 
@@ -402,7 +433,7 @@ def htf_trend(dfh):
         return 0
 
 
-def agent2_validate(cand, hdir, events, ccys, now):
+def agent2_validate(cand, hdir, events, ccys, now, need=None):
     score, why = 0, []
     blockers = [e for e in high_impact_for(events, ccys, 0, NEWS_BLOCK_MIN, now)
                 if e["impact"] == "High"]
@@ -421,10 +452,10 @@ def agent2_validate(cand, hdir, events, ccys, now):
     if cand.get("n_side", 1) >= 2:
         score += 1
         why.append("zbieznosc strategii")
-    return (score >= APPROVE_SCORE, score, why, None)
+    return (score >= (need if need is not None else APPROVE_SCORE), score, why, None)
 
 
-def fmt_signal(name, cand, score, why, news):
+def fmt_signal(name, cand, score, why, news, tv=None):
     emoji = "\U0001F7E2 LONG" if cand["side"] == "LONG" else "\U0001F534 SHORT"
     e = cand["entry"]
     d = 5 if abs(e) < 10 else 2
@@ -437,6 +468,8 @@ def fmt_signal(name, cand, score, why, news):
            f"TP2: {cand['tp2']:.{d}f}\n"
            f"\U00002705 Agent2 ({score} pkt): " + ", ".join(why) + "\n"
            f"\U0001F50E Agent1: " + ", ".join(cand["reasons"]))
+    if tv:
+        msg += f"\n\U0001F4CA TradingView 5m: {tv}"
     if news:
         msg += "\n\n\U000026A0 Wkrotce wazne wydarzenia:\n" + \
                "\n".join(fmt_event(x) for x in news)
@@ -453,6 +486,7 @@ def main():
     sent_bars = state.setdefault("sent_bars", {})
     last_send = state.setdefault("last_send", {})
     changed = False
+    print("TV check (zloto):", tv_rating("GC=F") or "niedostepny")
     events = fetch_calendar()
     now = dt.datetime.now(dt.timezone.utc)
     now_ny = dt.datetime.now(TZ_NY)
@@ -513,7 +547,9 @@ def main():
                     continue
                 best = None
                 for c in res[0]:
-                    ok, score, why, blocker = agent2_validate(c, hdir, events, ccys, now)
+                    ok, score, why, blocker = agent2_validate(
+                        c, hdir, events, ccys, now,
+                        need=MIN_SCORE.get(sym, APPROVE_SCORE))
                     if blocker is not None:
                         best = None; break
                     if ok and (best is None or score > best[1]):
@@ -527,8 +563,9 @@ def main():
 
             (c, score, why), bar_time = chosen
             news = high_impact_for(events, ccys, 0, NEWS_ATTACH_MIN, now)
-            send_telegram(fmt_signal(name, c, score, why, news))
-            log_signal(name, c, score, bar_time)
+            tv = tv_rating(sym)
+            send_telegram(fmt_signal(name, c, score, why, news, tv))
+            log_signal(name, c, score, bar_time, tv)
             seen.append(bar_time)
             sent_bars[sym] = seen[-120:]
             last_send[sym] = now.isoformat()
