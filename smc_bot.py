@@ -86,8 +86,23 @@ def send_telegram(text):
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     for chat in [c.strip() for c in CHAT_ID.split(",") if c.strip()]:
         try:
-            requests.post(url, json={"chat_id": chat, "text": text,
-                                     "disable_web_page_preview": True}, timeout=15)
+            r = requests.post(url, json={"chat_id": chat, "text": text,
+                                         "disable_web_page_preview": True}, timeout=15)
+            try:
+                j = r.json()
+            except Exception:
+                j = {}
+            if r.status_code == 200 and j.get("ok"):
+                print(f"Telegram OK ({chat}): dostarczono")
+            else:
+                # Telegram odmowil (np. 400/403/429) - wczesniej ginelo po cichu
+                print(f"Telegram ODRZUCIL ({chat}): HTTP {r.status_code} {str(j)[:200]}")
+                if r.status_code == 429:
+                    wait = int(j.get("parameters", {}).get("retry_after", 5))
+                    time.sleep(min(wait, 30))
+                    r2 = requests.post(url, json={"chat_id": chat, "text": text,
+                                                  "disable_web_page_preview": True}, timeout=15)
+                    print(f"Telegram ponowienie ({chat}): HTTP {r2.status_code}")
         except Exception as e:
             print(f"Telegram blad ({chat}):", e)
 
@@ -490,6 +505,11 @@ def main():
     last_send = state.setdefault("last_send", {})
     changed = False
     print("TV check (zloto):", tv_rating("GC=F") or "niedostepny")
+
+    # test lacznosci: TG_TEST=1 wysyla wiadomosc kontrolna (weryfikacja doreczen)
+    if os.getenv("TG_TEST") == "1":
+        send_telegram("\U0001F527 TEST LACZNOSCI - jesli to widzisz, doreczanie "
+                      "sygnalow na Telegram dziala poprawnie." + stopka())
     events = fetch_calendar()
     now = dt.datetime.now(dt.timezone.utc)
     now_ny = dt.datetime.now(TZ_NY)

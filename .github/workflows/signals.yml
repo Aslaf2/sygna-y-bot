@@ -18,6 +18,9 @@ on:
       petla_min:
         description: "Ile minut petli (0 = jeden skan, do testu)"
         default: "180"
+      test_tg:
+        description: "1 = wyslij wiadomosc testowa na Telegram"
+        default: "0"
 
 permissions:
   contents: write
@@ -42,6 +45,7 @@ jobs:
           TG_TOKEN:   ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           TF: "5m"
+          TG_TEST: ${{ github.event.inputs.test_tg }}
         run: |
           set +e
           git config user.name "smc-bot"
