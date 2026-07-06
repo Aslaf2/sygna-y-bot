@@ -487,13 +487,17 @@ def fmt_signal(name, cand, score, why, news, tv=None, delta=None):
     # delta = spot - futures: przeliczamy poziomy na ceny SPOT (jak u brokera /
     # na TradingView), bo Yahoo dla metali daje FUTURES (np. zloto ~10-40 USD wyzej)
     off = delta if delta is not None else 0.0
+    risk = abs(cand["entry"] - cand["sl"])
+    tp3 = cand["entry"] + (4 * risk if cand["side"] == "LONG" else -4 * risk)
     msg = (f"{emoji}  {name}\n"
            f"\U0001F9E0 Strategia: {cand['strategy']}\n"
            f"----------------------\n"
            f"Wejscie: {cand['entry'] + off:.{d}f}\n"
            f"SL: {cand['sl'] + off:.{d}f}\n"
-           f"TP1: {cand['tp1'] + off:.{d}f}\n"
-           f"TP2: {cand['tp2'] + off:.{d}f}\n"
+           f"TP1: {cand['tp1'] + off:.{d}f}  ← zamknij 50% i przesun SL na wejscie\n"
+           f"TP2: {cand['tp2'] + off:.{d}f}  ← zamknij 30%\n"
+           f"TP3: {tp3 + off:.{d}f}  ← zamknij reszte (20%)\n"
+           f"\U0001F4A1 Po TP1 pozycja jest bez ryzyka (SL na wejsciu)\n"
            f"\U00002705 Agent2 ({score} pkt): " + ", ".join(why) + "\n"
            f"\U0001F50E Agent1: " + ", ".join(cand["reasons"]))
     if delta is not None:
