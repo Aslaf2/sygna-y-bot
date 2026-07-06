@@ -128,8 +128,8 @@ def stopka():
     return f"\n\U0001F552 {now_pl()} (czas PL)"
 
 
-def tv_rating(sym):
-    """Ocena TradingView (interwal 5m), np. 'BUY (14/3/9)'. None gdy niedostepna."""
+def tv_info(sym):
+    """TradingView (5m): ocena + aktualna cena SPOT. None gdy niedostepne."""
     m = TV_TA_MAP.get(sym)
     if not m:
         return None
@@ -138,13 +138,19 @@ def tv_rating(sym):
         a = TA_Handler(symbol=m[0], exchange=m[1], screener=m[2],
                        interval=Interval.INTERVAL_5_MINUTES).get_analysis()
         s = a.summary
-        return f"{s['RECOMMENDATION']} ({s['BUY']}/{s['SELL']}/{s['NEUTRAL']})"
+        return {"rating": f"{s['RECOMMENDATION']} ({s['BUY']}/{s['SELL']}/{s['NEUTRAL']})",
+                "close": float(a.indicators.get("close", 0)) or None}
     except Exception as e:
         print(f"  TradingView {m[0]}: {e}")
         return None
 
 
-def log_signal(name, cand, score, bar_time, tv=None):
+def tv_rating(sym):
+    info = tv_info(sym)
+    return info["rating"] if info else None
+
+
+def log_signal(name, cand, score, bar_time, tv=None, spot_delta=None):
     """Dopisuje WYSLANY sygnal do CSV (do pozniejszego Excela z wynikami).
     TP3 = 4R liczone tu (wiadomosc pokazuje TP1/TP2, log trzyma tez TP3)."""
     risk = abs(cand["entry"] - cand["sl"])
@@ -156,11 +162,12 @@ def log_signal(name, cand, score, bar_time, tv=None):
             if nowe:
                 w.writerow(["data_pl", "data_utc", "instrument", "strona", "strategia",
                             "score", "entry", "sl", "tp1", "tp2", "tp3", "swieca",
-                            "powody", "tv"])
+                            "powody", "tv", "spot_delta"])
             w.writerow([now_pl(), dt.datetime.now(dt.timezone.utc).isoformat(),
                         name, cand["side"], cand["strategy"], score,
                         cand["entry"], cand["sl"], cand["tp1"], cand["tp2"], tp3,
-                        bar_time, "; ".join(cand.get("reasons", [])), tv or ""])
+                        bar_time, "; ".join(cand.get("reasons", [])), tv or "",
+                        f"{spot_delta:.5f}" if spot_delta is not None else ""])
     except Exception as e:
         print("log_signal blad:", e)
 
@@ -473,19 +480,24 @@ def agent2_validate(cand, hdir, events, ccys, now, need=None):
     return (score >= (need if need is not None else APPROVE_SCORE), score, why, None)
 
 
-def fmt_signal(name, cand, score, why, news, tv=None):
+def fmt_signal(name, cand, score, why, news, tv=None, delta=None):
     emoji = "\U0001F7E2 LONG" if cand["side"] == "LONG" else "\U0001F534 SHORT"
     e = cand["entry"]
     d = 5 if abs(e) < 10 else 2
+    # delta = spot - futures: przeliczamy poziomy na ceny SPOT (jak u brokera /
+    # na TradingView), bo Yahoo dla metali daje FUTURES (np. zloto ~10-40 USD wyzej)
+    off = delta if delta is not None else 0.0
     msg = (f"{emoji}  {name}\n"
            f"\U0001F9E0 Strategia: {cand['strategy']}\n"
            f"----------------------\n"
-           f"Wejscie: {cand['entry']:.{d}f}\n"
-           f"SL: {cand['sl']:.{d}f}\n"
-           f"TP1: {cand['tp1']:.{d}f}\n"
-           f"TP2: {cand['tp2']:.{d}f}\n"
+           f"Wejscie: {cand['entry'] + off:.{d}f}\n"
+           f"SL: {cand['sl'] + off:.{d}f}\n"
+           f"TP1: {cand['tp1'] + off:.{d}f}\n"
+           f"TP2: {cand['tp2'] + off:.{d}f}\n"
            f"\U00002705 Agent2 ({score} pkt): " + ", ".join(why) + "\n"
            f"\U0001F50E Agent1: " + ", ".join(cand["reasons"]))
+    if delta is not None:
+        msg += f"\n\U0001F4CD Ceny SPOT (broker/TView); futures {-off:+.{d}f} od spot"
     if tv:
         msg += f"\n\U0001F4CA TradingView 5m: {tv}"
     if news:
@@ -586,9 +598,21 @@ def main():
 
             (c, score, why), bar_time = chosen
             news = high_impact_for(events, ccys, 0, NEWS_ATTACH_MIN, now)
-            tv = tv_rating(sym)
-            send_telegram(fmt_signal(name, c, score, why, news, tv))
-            log_signal(name, c, score, bar_time, tv)
+            info = tv_info(sym)
+            tv = info["rating"] if info else None
+            delta = None
+            if info and info.get("close"):
+                try:
+                    fut_now = float(df["Close"].iloc[-1])
+                    dlt = info["close"] - fut_now
+                    # koryguj tylko realna roznice zrodel (futures vs spot);
+                    # szum <0.05% pomijamy, >2% = podejrzane dane, nie ruszamy
+                    if 0.0005 < abs(dlt) / fut_now < 0.02:
+                        delta = dlt
+                except Exception:
+                    pass
+            send_telegram(fmt_signal(name, c, score, why, news, tv, delta))
+            log_signal(name, c, score, bar_time, tv, delta)
             seen.append(bar_time)
             sent_bars[sym] = seen[-120:]
             last_send[sym] = now.isoformat()
