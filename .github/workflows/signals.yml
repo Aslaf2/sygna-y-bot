@@ -64,3 +64,21 @@ jobs:
             [ "$(date +%s)" -ge "$KONIEC" ] && break
             sleep 300
           done
+
+      # LANCUCH: kazdy bieg na koncu odpala nastepny (workflow_dispatch tokenem
+      # z sekretu - GITHUB_TOKEN ma blokade rekurencji). Dzieki temu bot dziala
+      # 24/7 niezaleznie od zawodnego harmonogramu GitHuba (crony zostaja jako
+      # awaryjne re-startery). Aby ZATRZYMAC lancuch: usun sekret DISPATCH_TOKEN
+      # albo wylacz workflow w zakladce Actions.
+      - name: Lancuch - odpal nastepny bieg
+        if: always()
+        env:
+          DISPATCH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$DISPATCH_TOKEN" ]; then echo "brak DISPATCH_TOKEN - lancuch wylaczony"; exit 0; fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            -H "Authorization: Bearer $DISPATCH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/signals.yml/dispatches" \
+            -d '{"ref":"main"}')
+          echo "lancuch: dispatch HTTP $code"
