@@ -77,6 +77,10 @@ NEWS_ATTACH_MIN = 120
 NEWS_BLOCK_MIN  = 30
 STATE_FILE      = "state.json"
 LOG_FILE        = "sygnaly_log.csv"   # historia WYSLANYCH sygnalow (do Excela z wynikami)
+RUN_STATS_FILE  = "run_stats.json"    # statystyki kazdego skanu (dashboard: Scan->Fill)
+WYNIKI_FILE     = "wyniki.json"       # rozliczenia TP/SL wyslanych sygnalow (dashboard: Settle)
+
+NAME2SYM = {name: sym for name, sym, _ in SYMBOLS}
 
 
 def send_telegram(text):
@@ -170,6 +174,121 @@ def log_signal(name, cand, score, bar_time, tv=None, spot_delta=None):
                         f"{spot_delta:.5f}" if spot_delta is not None else ""])
     except Exception as e:
         print("log_signal blad:", e)
+
+
+def load_json(path, default):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return default
+
+
+def save_json(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=1, ensure_ascii=False)
+
+
+def _settle_one(row, df):
+    """Rozlicza jeden sygnal na swiecach 5m. Model = plan z wiadomosci Telegram:
+    50% na TP1 (potem SL na wejscie), 30% na TP2, 20% na TP3.
+    Ostroznie: gdy SL i TP wypadaja w tej samej swiecy, liczymy SL - z wyjatkiem
+    swiecy, w ktorej wlasnie osiagnieto TP (tam nie wybijamy na swiezo
+    przesunietym SL, bo cena przeszla przez wejscie wczesniej w tej swiecy).
+    Zwraca (status, wynik_R) albo None, gdy dane nie obejmuja sygnalu."""
+    lng = row["strona"] == "LONG"
+    entry = float(row["entry"])
+    tp1, tp2, tp3 = float(row["tp1"]), float(row["tp2"]), float(row["tp3"])
+    stop = float(row["sl"])
+    t0 = pd.to_datetime(row["swieca"], utc=True)
+    if df.empty:
+        return None
+    idx0 = df.index[0]
+    if idx0.tzinfo is None:
+        return None
+    if idx0 > t0:
+        return None          # historia nie siega poczatku sygnalu
+    bars = df[df.index > t0]  # wejscie na zamknieciu swiecy sygnalowej
+    if bars.empty:
+        return ("otwarty", 0.0)
+    phase = 0                 # 0=pelna pozycja, 1=po TP1 (SL=BE), 2=po TP2
+    for hi, lo in zip(bars["High"].values, bars["Low"].values):
+        hi, lo = float(hi), float(lo)
+        upgraded = False
+        while True:
+            stop_hit = (lo <= stop) if lng else (hi >= stop)
+            if stop_hit and not upgraded:
+                if phase == 0:
+                    return ("SL", -1.0)
+                if phase == 1:
+                    return ("TP1+BE", 1.0)
+                return ("TP2+BE", 1.9)
+            if phase == 0 and ((hi >= tp1) if lng else (lo <= tp1)):
+                phase, stop, upgraded = 1, entry, True
+                continue
+            if phase == 1 and ((hi >= tp2) if lng else (lo <= tp2)):
+                phase, upgraded = 2, True
+                continue
+            if phase == 2 and ((hi >= tp3) if lng else (lo <= tp3)):
+                return ("TP3", 2.7)
+            break
+    return ("otwarty", [0.0, 1.0, 1.9][phase])
+
+
+def settle_signals(dfs):
+    """SETTLE: rozlicza sygnaly z CSV na danych pobranych w tym biegu (zero
+    dodatkowych zapytan do Yahoo). Wyniki (R) w wyniki.json, klucz = data_utc."""
+    if not os.path.exists(LOG_FILE):
+        return
+    wyniki = load_json(WYNIKI_FILE, {})
+    changed = False
+    try:
+        with open(LOG_FILE, encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+    except Exception as e:
+        print("settle: blad odczytu CSV:", e)
+        return
+    for row in rows:
+        key = row["data_utc"]
+        prev = wyniki.get(key)
+        if prev and prev.get("status") != "otwarty":
+            continue
+        df = dfs.get(NAME2SYM.get(row["instrument"]))
+        if df is None or df.empty:
+            continue
+        try:
+            res = _settle_one(row, df)
+        except Exception as e:
+            print("settle: blad", key, "->", e)
+            continue
+        if res is None:
+            if prev is None:
+                wyniki[key] = {"instrument": row["instrument"], "strona": row["strona"],
+                               "strategia": row["strategia"], "status": "brak_danych", "r": 0.0}
+                changed = True
+            continue
+        status, r = res
+        if prev and prev.get("status") == status and abs(prev.get("r", 0) - r) < 1e-9:
+            continue
+        wyniki[key] = {"instrument": row["instrument"], "strona": row["strona"],
+                       "strategia": row["strategia"], "status": status, "r": round(r, 4),
+                       "rozliczono_utc": dt.datetime.now(dt.timezone.utc).isoformat()}
+        changed = True
+    if changed:
+        save_json(WYNIKI_FILE, wyniki)
+        print("settle: zaktualizowano wyniki.json")
+
+
+def save_run_stats(stats):
+    """Statystyki biegu dla dashboardu: ostatni skan + skrocona historia."""
+    old = load_json(RUN_STATS_FILE, {})
+    hist = old.get("historia", [])
+    hist.append({"t": stats["czas_utc"],
+                 "k": sum(i.get("kandydaci", 0) for i in stats["instrumenty"].values()),
+                 "z": sum(i.get("zatwierdzone", 0) for i in stats["instrumenty"].values()),
+                 "w": sum(1 for i in stats["instrumenty"].values() if i.get("wyslane"))})
+    stats["historia"] = hist[-200:]
+    save_json(RUN_STATS_FILE, stats)
 
 
 def fetch_calendar():
@@ -547,20 +666,33 @@ def main():
         changed = True
 
     data_fail = []
+    dfs = {}                       # pobrane dane per instrument (do SETTLE)
+    run_stats = {"czas_utc": now.isoformat(), "czas_pl": now_pl(), "instrumenty": {}}
     for name, sym, ccys in SYMBOLS:
+        ins = run_stats["instrumenty"].setdefault(
+            name, {"etap": "scan", "kandydaci": 0, "zatwierdzone": 0,
+                   "wyslane": False, "opis": ""})
         try:
             li = last_send.get(sym)
             if li:
                 try:
                     if (now - dt.datetime.fromisoformat(li)).total_seconds() < COOLDOWN_MIN * 60:
-                        print(f"{name}: cooldown"); continue
+                        print(f"{name}: cooldown")
+                        ins["etap"], ins["opis"] = "cooldown", "pauza po ostatnim sygnale"
+                        df = dl(sym, "10d", INTERVAL)   # dane i tak potrzebne do SETTLE
+                        if not df.empty:
+                            dfs[sym] = df
+                        time.sleep(1); continue
                 except Exception:
                     pass
 
             df = dl(sym, "10d", INTERVAL)
             if df.empty or len(df) < EMA_LEN + SWING_LEN + 12:
                 print(f"{name}: brak danych (Yahoo)"); data_fail.append(name)
+                ins["etap"], ins["opis"] = "scan", "brak danych rynkowych"
                 time.sleep(2); continue
+            dfs[sym] = df
+            ins["bars"] = int(len(df))
 
             dff = df.iloc[:-1]
             hdir = htf_from_5m(df)
@@ -584,21 +716,32 @@ def main():
                 res = agent1_scout(sub, nyt)
                 if not res or not res[0]:
                     continue
+                ins["kandydaci"] += len(res[0])
+                ins["etap"] = "detect"
                 best = None
                 for c in res[0]:
                     ok, score, why, blocker = agent2_validate(
                         c, hdir, events, ccys, now,
                         need=MIN_SCORE.get(sym, APPROVE_SCORE))
                     if blocker is not None:
+                        ins["opis"] = "blokada: dane makro za chwile"
                         best = None; break
-                    if ok and (best is None or score > best[1]):
-                        best = (c, score, why)
+                    if ok:
+                        ins["zatwierdzone"] += 1
+                        if best is None or score > best[1]:
+                            best = (c, score, why)
                 if best:
+                    ins["etap"] = "validate"
                     chosen = (best, bar_time)
                     break
 
             if not chosen:
-                print(f"{name}: brak nowego sygnalu"); continue
+                print(f"{name}: brak nowego sygnalu")
+                if ins["etap"] == "detect" and not ins["opis"]:
+                    ins["opis"] = "kandydaci odrzuceni przez walidator"
+                elif ins["etap"] == "scan":
+                    ins["opis"] = "brak setupu na ostatnich swiecach"
+                continue
 
             (c, score, why), bar_time = chosen
             news = high_impact_for(events, ccys, 0, NEWS_ATTACH_MIN, now)
@@ -621,10 +764,23 @@ def main():
             sent_bars[sym] = seen[-120:]
             last_send[sym] = now.isoformat()
             changed = True
+            ins["etap"], ins["wyslane"] = "fill", True
+            ins["opis"] = f"WYSLANO {c['side']} ({c['strategy']}, {score} pkt)"
             print(f"{name}: WYSLANO {c['side']} ({c['strategy']})")
 
         except Exception as e:
             print(f"{name}: blad -> {e}")
+            ins["opis"] = f"blad: {e}"
+
+    # SETTLE - rozliczenie wyslanych sygnalow na danych z tego biegu
+    try:
+        settle_signals(dfs)
+    except Exception as e:
+        print("settle: blad ->", e)
+    try:
+        save_run_stats(run_stats)
+    except Exception as e:
+        print("run_stats: blad ->", e)
 
     # ALARM: brak danych rynkowych (np. Yahoo blokuje chmure) - zeby nie bylo
     # "zielono, ale niemo". Wysylany najwyzej raz na 3h.

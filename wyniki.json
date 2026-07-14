@@ -1,0 +1,658 @@
+{
+ "2026-06-29T18:32:38.694209+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.367281+00:00"
+ },
+ "2026-06-29T18:32:40.525099+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.368281+00:00"
+ },
+ "2026-06-29T18:42:49.119119+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.369283+00:00"
+ },
+ "2026-06-29T18:47:52.163203+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.369283+00:00"
+ },
+ "2026-06-29T19:03:03.890386+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.370282+00:00"
+ },
+ "2026-06-29T19:08:07.068555+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.370282+00:00"
+ },
+ "2026-06-29T19:13:13.033053+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.371283+00:00"
+ },
+ "2026-06-29T19:28:22.294746+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.371283+00:00"
+ },
+ "2026-06-29T19:33:27.820797+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.372282+00:00"
+ },
+ "2026-06-30T14:09:54.916167+00:00": {
+  "instrument": "EURUSD",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.372282+00:00"
+ },
+ "2026-06-30T14:25:07.589984+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.373283+00:00"
+ },
+ "2026-06-30T14:25:09.204486+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.374283+00:00"
+ },
+ "2026-06-30T14:30:13.787395+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.374283+00:00"
+ },
+ "2026-06-30T14:30:15.392154+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.375283+00:00"
+ },
+ "2026-06-30T14:45:19.857915+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.375283+00:00"
+ },
+ "2026-06-30T14:45:21.530682+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.376282+00:00"
+ },
+ "2026-06-30T14:50:25.190286+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.377282+00:00"
+ },
+ "2026-06-30T15:10:40.096572+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.378282+00:00"
+ },
+ "2026-06-30T18:10:13.550109+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.378282+00:00"
+ },
+ "2026-06-30T18:20:22.662915+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.379282+00:00"
+ },
+ "2026-06-30T18:30:32.837049+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.380282+00:00"
+ },
+ "2026-06-30T18:50:52.679189+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.380282+00:00"
+ },
+ "2026-06-30T18:55:57.020918+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.381283+00:00"
+ },
+ "2026-06-30T19:16:13.384977+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.381283+00:00"
+ },
+ "2026-07-01T18:16:11.241273+00:00": {
+  "instrument": "EURUSD",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.382283+00:00"
+ },
+ "2026-07-01T18:36:31.951046+00:00": {
+  "instrument": "EURUSD",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.383283+00:00"
+ },
+ "2026-07-01T19:07:03.814159+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "LONG",
+  "strategia": "Liquidity Sweep",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.383283+00:00"
+ },
+ "2026-07-02T14:19:13.884222+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.384283+00:00"
+ },
+ "2026-07-02T14:34:29.786302+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP1+BE",
+  "r": 1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.384283+00:00"
+ },
+ "2026-07-02T14:54:50.335851+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.385283+00:00"
+ },
+ "2026-07-02T14:59:56.160185+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "TP2+BE",
+  "r": 1.9,
+  "rozliczono_utc": "2026-07-14T19:54:33.386283+00:00"
+ },
+ "2026-07-02T15:10:02.572547+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.386283+00:00"
+ },
+ "2026-07-02T15:20:11.555134+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.387283+00:00"
+ },
+ "2026-07-02T15:30:19.384059+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.387283+00:00"
+ },
+ "2026-07-02T18:15:06.204365+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.388283+00:00"
+ },
+ "2026-07-02T18:20:11.534742+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "TP2+BE",
+  "r": 1.9,
+  "rozliczono_utc": "2026-07-14T19:54:33.388283+00:00"
+ },
+ "2026-07-02T18:20:13.051087+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.389283+00:00"
+ },
+ "2026-07-02T18:35:21.841138+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.389283+00:00"
+ },
+ "2026-07-02T18:40:26.078525+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "TP2+BE",
+  "r": 1.9,
+  "rozliczono_utc": "2026-07-14T19:54:33.390283+00:00"
+ },
+ "2026-07-02T18:45:31.474896+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.390283+00:00"
+ },
+ "2026-07-02T18:55:37.629591+00:00": {
+  "instrument": "EURUSD",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.391282+00:00"
+ },
+ "2026-07-02T19:00:41.761766+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "TP2+BE",
+  "r": 1.9,
+  "rozliczono_utc": "2026-07-14T19:54:33.392282+00:00"
+ },
+ "2026-07-02T19:05:45.992450+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.392282+00:00"
+ },
+ "2026-07-06T18:11:37.045668+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.393282+00:00"
+ },
+ "2026-07-06T18:31:57.996965+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.393282+00:00"
+ },
+ "2026-07-06T18:31:59.625741+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.394282+00:00"
+ },
+ "2026-07-06T18:32:02.448185+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.394282+00:00"
+ },
+ "2026-07-07T07:22:33.753069+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.395283+00:00"
+ },
+ "2026-07-07T07:22:35.354469+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.395283+00:00"
+ },
+ "2026-07-07T08:08:18.107039+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.396283+00:00"
+ },
+ "2026-07-07T14:21:07.990767+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.396283+00:00"
+ },
+ "2026-07-07T14:41:27.814891+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.397283+00:00"
+ },
+ "2026-07-07T14:46:36.630613+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.397283+00:00"
+ },
+ "2026-07-07T15:02:12.795762+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.398282+00:00"
+ },
+ "2026-07-07T18:21:15.303691+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.399324+00:00"
+ },
+ "2026-07-07T18:36:32.039574+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.399324+00:00"
+ },
+ "2026-07-07T18:46:41.015377+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.400326+00:00"
+ },
+ "2026-07-07T18:56:51.321153+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP1+BE",
+  "r": 1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.400326+00:00"
+ },
+ "2026-07-07T19:06:58.150765+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.401325+00:00"
+ },
+ "2026-07-07T19:06:59.800726+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.401325+00:00"
+ },
+ "2026-07-08T07:22:29.115256+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.402325+00:00"
+ },
+ "2026-07-08T08:13:27.851514+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.402325+00:00"
+ },
+ "2026-07-08T14:21:20.305074+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.403325+00:00"
+ },
+ "2026-07-08T14:51:48.699149+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.403325+00:00"
+ },
+ "2026-07-08T14:51:50.523226+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.404325+00:00"
+ },
+ "2026-07-08T14:51:53.480217+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.404325+00:00"
+ },
+ "2026-07-08T18:36:44.575226+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.405323+00:00"
+ },
+ "2026-07-09T07:17:25.609281+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.405323+00:00"
+ },
+ "2026-07-10T07:38:32.636454+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.406324+00:00"
+ },
+ "2026-07-10T08:03:56.786025+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.406324+00:00"
+ },
+ "2026-07-10T14:52:33.794852+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.407326+00:00"
+ },
+ "2026-07-10T14:52:35.650865+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.407326+00:00"
+ },
+ "2026-07-10T15:17:58.413437+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.408280+00:00"
+ },
+ "2026-07-10T15:18:00.378840+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T19:54:33.409279+00:00"
+ },
+ "2026-07-10T18:16:44.831594+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.409279+00:00"
+ },
+ "2026-07-10T18:16:46.573119+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.410279+00:00"
+ },
+ "2026-07-10T18:57:24.203326+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.410279+00:00"
+ },
+ "2026-07-10T18:57:25.966293+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.410279+00:00"
+ },
+ "2026-07-13T14:22:41.832922+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.411279+00:00"
+ },
+ "2026-07-13T14:22:43.649881+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.412279+00:00"
+ },
+ "2026-07-13T14:42:59.679340+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.412279+00:00"
+ },
+ "2026-07-13T14:53:11.637387+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T19:54:33.413279+00:00"
+ }
+}

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SMC × TELEGRAM — dashboard sygnałów</title>
+<style>
+  :root{
+    --bg:#07090d; --panel:#0d1117; --border:#1c2430; --txt:#c9d4e0; --dim:#5a6a7d;
+    --orange:#f5a623; --green:#2ecc71; --red:#ff4d4d; --blue:#4da6ff; --yellow:#ffd24d;
+    --mono:"JetBrains Mono","Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:var(--mono);font-size:13px;padding:14px;max-width:1100px;margin:0 auto}
+  a{color:var(--blue);text-decoration:none}
+  .head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:14px}
+  .head h1{font-size:15px;letter-spacing:2px;color:#fff}
+  .head .sub{color:var(--dim);font-size:11px}
+  .live{display:inline-flex;align-items:center;gap:5px;background:#16090b;border:1px solid #3a1418;color:var(--red);font-size:10px;padding:2px 8px;border-radius:3px;letter-spacing:1px}
+  .live .dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:puls 1.2s infinite}
+  @keyframes puls{0%,100%{opacity:1}50%{opacity:.25}}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:12px}
+  .panel .lbl{color:var(--dim);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+  .panel .val{font-size:26px;font-weight:700;color:#fff}
+  .panel .val.big{font-size:38px;color:var(--orange)}
+  .panel .note{color:var(--dim);font-size:10px;margin-top:5px}
+  .pos{color:var(--green)!important}.neg{color:var(--red)!important}
+  .wide{margin-bottom:14px}
+  h2{font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:10px}
+  .pipe{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .stage{flex:1;min-width:100px;background:#0a0e14;border:1px solid var(--border);border-radius:5px;padding:8px 10px;text-align:center}
+  .stage .n{font-size:20px;font-weight:700;color:#fff}
+  .stage .t{font-size:9px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase}
+  .stage.on{border-color:var(--orange);box-shadow:0 0 12px rgba(245,166,35,.12)}
+  .stage.on .n{color:var(--orange)}
+  .arrow{color:var(--dim)}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{color:var(--dim);font-size:10px;letter-spacing:1px;text-transform:uppercase;text-align:left;padding:4px 8px;border-bottom:1px solid var(--border)}
+  td{padding:5px 8px;border-bottom:1px solid #11161f;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  .tag{display:inline-block;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700}
+  .tag.long{background:#0b2417;color:var(--green)}
+  .tag.short{background:#2a0f12;color:var(--red)}
+  .st-sl{color:var(--red)} .st-tp{color:var(--green)} .st-be{color:var(--yellow)} .st-open{color:var(--blue)} .st-nd{color:var(--dim)}
+  canvas{width:100%;height:170px;display:block}
+  .scroll{overflow-x:auto}
+  .foot{color:var(--dim);font-size:10px;line-height:1.6;border-top:1px solid var(--border);padding-top:10px;margin-top:16px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:700px){.cols{grid-template-columns:1fr}.panel .val.big{font-size:30px}}
+  #err{color:var(--red);margin-bottom:10px;display:none}
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1>SMC × TELEGRAM</h1>
+    <span class="live"><span class="dot"></span>LIVE</span>
+    <span class="sub">@Aslafekbot · XAUUSD / XAGUSD / EURUSD / US100 · 5M · ICT</span>
+    <span class="sub" id="lastscan" style="margin-left:auto">—</span>
+  </div>
+  <div id="err"></div>
+
+  <div class="grid" id="tiles"></div>
+
+  <div class="panel wide">
+    <h2>Cykl egzekucji — ostatni skan</h2>
+    <div class="pipe" id="pipe"></div>
+    <div class="scroll" style="margin-top:10px"><table id="runtab"></table></div>
+  </div>
+
+  <div class="cols wide">
+    <div class="panel">
+      <h2>Krzywa kapitału (skumulowane R)</h2>
+      <canvas id="eq" height="170"></canvas>
+    </div>
+    <div class="panel">
+      <h2>Wynik per instrument</h2>
+      <div class="scroll"><table id="insttab"></table></div>
+      <h2 style="margin-top:14px">Wynik per strategia</h2>
+      <div class="scroll"><table id="strattab"></table></div>
+    </div>
+  </div>
+
+  <div class="panel wide">
+    <h2>Ostatnie sygnały</h2>
+    <div class="scroll"><table id="sigtab"></table></div>
+  </div>
+
+  <div class="foot">
+    ⚠ Sygnały <b>papierowe</b> — bot analizuje i wysyła sygnały na Telegram, nie handluje pieniędzmi.
+    Wyniki w <b>R</b> (1R = ryzyko od wejścia do SL) wg planu z wiadomości: 50% na TP1 → SL na wejście, 30% na TP2, 20% na TP3.
+    Rozliczenie ostrożne: gdy SL i TP wypadają w tej samej świecy, liczony jest SL.
+    Dane: Yahoo Finance (metale = futures). Odświeżanie co 60 s.
+  </div>
+
+<script>
+const RAW = "https://raw.githubusercontent.com/Aslaf2/sygna-y-bot/main/";
+const R_STATUS = {"SL":"st-sl","TP1+BE":"st-be","TP2+BE":"st-be","TP3":"st-tp","otwarty":"st-open","brak_danych":"st-nd"};
+
+async function pobierz(plik, jakoJson){
+  // najpierw plik obok dashboardu (serwer lokalny / GitHub Pages), potem raw z GitHuba
+  for (const url of [plik, RAW + plik]){
+    try{
+      const r = await fetch(url + "?t=" + Date.now(), {cache:"no-store"});
+      if (!r.ok) continue;
+      return jakoJson ? await r.json() : await r.text();
+    }catch(e){ /* sprobuj nastepnego zrodla */ }
+  }
+  return null;
+}
+
+function csvParse(txt){
+  const lines = txt.trim().split(/\r?\n/);
+  const head = lines[0].split(",");
+  return lines.slice(1).map(l=>{
+    const c = l.split(",");
+    const o = {};
+    head.forEach((h,i)=>o[h]=c[i]);
+    return o;
+  });
+}
+
+function fmtR(x){ return (x>=0?"+":"") + x.toFixed(2) + "R"; }
+
+function tile(lbl, val, cls, note){
+  return `<div class="panel"><div class="lbl">${lbl}</div><div class="val ${cls||""}">${val}</div>${note?`<div class="note">${note}</div>`:""}</div>`;
+}
+
+function rysujEq(pkt){
+  const cv = document.getElementById("eq");
+  const dpr = window.devicePixelRatio||1;
+  const W = cv.clientWidth*dpr, H = 170*dpr;
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext("2d");
+  ctx.clearRect(0,0,W,H);
+  if (pkt.length<2){ ctx.fillStyle="#5a6a7d"; ctx.font=`${11*dpr}px monospace`; ctx.fillText("za mało rozliczonych sygnałów",10*dpr,H/2); return; }
+  const min = Math.min(0,...pkt), max = Math.max(0,...pkt), pad = 8*dpr;
+  const sx = (W-2*pad)/(pkt.length-1), sy = (H-2*pad)/((max-min)||1);
+  const Y = v => H-pad-(v-min)*sy;
+  // linia zera
+  ctx.strokeStyle="#1c2430"; ctx.lineWidth=dpr; ctx.setLineDash([4*dpr,4*dpr]);
+  ctx.beginPath(); ctx.moveTo(pad,Y(0)); ctx.lineTo(W-pad,Y(0)); ctx.stroke(); ctx.setLineDash([]);
+  // wypelnienie + linia
+  const last = pkt[pkt.length-1];
+  const kol = last>=0 ? "#2ecc71" : "#ff4d4d";
+  ctx.beginPath(); ctx.moveTo(pad,Y(pkt[0]));
+  pkt.forEach((v,i)=>ctx.lineTo(pad+i*sx,Y(v)));
+  ctx.strokeStyle=kol; ctx.lineWidth=2*dpr; ctx.stroke();
+  ctx.lineTo(W-pad,Y(0)); ctx.lineTo(pad,Y(0)); ctx.closePath();
+  ctx.fillStyle = last>=0 ? "rgba(46,204,113,.08)" : "rgba(255,77,77,.08)";
+  ctx.fill();
+  ctx.fillStyle=kol; ctx.font=`bold ${12*dpr}px monospace`;
+  ctx.fillText(fmtR(last), W-70*dpr, Y(last)-6*dpr);
+}
+
+function agreguj(rows, klucz){
+  const m = {};
+  rows.forEach(r=>{
+    const k = r[klucz]; m[k] = m[k]||{n:0,w:0,r:0};
+    m[k].n++; if(r._r>0)m[k].w++; m[k].r+=r._r;
+  });
+  return Object.entries(m).sort((a,b)=>b[1].r-a[1].r);
+}
+
+function tabela(el, naglowki, wiersze){
+  document.getElementById(el).innerHTML =
+    "<tr>"+naglowki.map(h=>`<th>${h}</th>`).join("")+"</tr>" +
+    wiersze.map(w=>"<tr>"+w.map(c=>`<td>${c}</td>`).join("")+"</tr>").join("");
+}
+
+async function odswiez(){
+  const [csv, wyniki, stats] = await Promise.all([
+    pobierz("sygnaly_log.csv"), pobierz("wyniki.json",true), pobierz("run_stats.json",true)]);
+  const err = document.getElementById("err");
+  if (!csv){ err.style.display="block"; err.textContent="Nie udało się pobrać danych (sprawdź internet / repo)."; return; }
+  err.style.display="none";
+  const sygnaly = csvParse(csv);
+  const wy = wyniki||{};
+
+  // polacz sygnal + wynik
+  sygnaly.forEach(s=>{
+    const w = wy[s.data_utc];
+    s._status = w ? w.status : "otwarty";
+    s._r = w ? (w.r||0) : 0;
+  });
+  const rozliczone = sygnaly.filter(s=>["SL","TP1+BE","TP2+BE","TP3"].includes(s._status));
+  const otwarte    = sygnaly.filter(s=>s._status==="otwarty");
+  const sumR  = rozliczone.reduce((a,s)=>a+s._r,0);
+  const wins  = rozliczone.filter(s=>s._r>0).length;
+  const wr    = rozliczone.length ? 100*wins/rozliczone.length : 0;
+  const avg   = rozliczone.length ? sumR/rozliczone.length : 0;
+
+  document.getElementById("tiles").innerHTML =
+    tile("Wynik łączny", fmtR(sumR), sumR>=0?"big pos":"big neg",
+         `przy ryzyku 100 zł/sygnał ≈ <b>${(sumR*100).toFixed(0)} zł</b>`) +
+    tile("Sygnały", sygnaly.length, "", `rozliczone: ${rozliczone.length} · otwarte: ${otwarte.length}`) +
+    tile("Win rate", wr.toFixed(0)+"%", wr>=50?"pos":"neg", `${wins}/${rozliczone.length} zyskownych`) +
+    tile("Śr. R / sygnał", fmtR(avg), avg>=0?"pos":"neg", "TP1=+1R · TP2=+1.9R · TP3=+2.7R · SL=−1R");
+
+  // pipeline z ostatniego skanu
+  const inst = stats ? stats.instrumenty||{} : {};
+  const vals = Object.values(inst);
+  const det  = vals.reduce((a,i)=>a+(i.kandydaci||0),0);
+  const val  = vals.reduce((a,i)=>a+(i.zatwierdzone||0),0);
+  const fil  = vals.filter(i=>i.wyslane).length;
+  const etapy = [["Scan",vals.length,"skanowane instrumenty"],["Detect",det,"kandydaci (4 strategie ICT)"],
+                 ["Validate",val,"zatwierdzone (Agent 2)"],["Size",val,"policzone SL / TP / R"],
+                 ["Fill",fil,"wysłane na Telegram"],["Settle",rozliczone.length,"rozliczone łącznie"]];
+  document.getElementById("pipe").innerHTML = etapy.map(([t,n,tip],i)=>
+    `<div class="stage ${n>0?"on":""}" title="${tip}"><div class="n">${n}</div><div class="t">${t}</div></div>`
+  ).join(`<span class="arrow">›</span>`);
+  document.getElementById("lastscan").textContent = stats ? ("ostatni skan: "+(stats.czas_pl||"—")) : "czekam na pierwszy skan z nowym kodem…";
+
+  tabela("runtab", ["Instrument","Etap","Kandydaci","Zatw.","Info"],
+    Object.entries(inst).map(([n,i])=>[n, (i.etap||"—").toUpperCase(), i.kandydaci||0, i.zatwierdzone||0, i.opis||"—"]));
+
+  // krzywa kapitalu
+  let c = 0;
+  rysujEq(rozliczone.map(s=>c+=s._r).map(v=>+v.toFixed(2)));
+
+  // agregaty
+  tabela("insttab", ["Instrument","Sygn.","Win","R"],
+    agreguj(rozliczone,"instrument").map(([k,v])=>[k.replace(/ \(.*\)/,""),v.n,v.w,`<span class="${v.r>=0?"st-tp":"st-sl"}">${fmtR(v.r)}</span>`]));
+  tabela("strattab", ["Strategia","Sygn.","Win","R"],
+    agreguj(rozliczone,"strategia").map(([k,v])=>[k,v.n,v.w,`<span class="${v.r>=0?"st-tp":"st-sl"}">${fmtR(v.r)}</span>`]));
+
+  // ostatnie sygnaly
+  tabela("sigtab", ["Data (PL)","Instrument","Strona","Strategia","Wejście","Status","R","TV"],
+    sygnaly.slice(-20).reverse().map(s=>[
+      s.data_pl, s.instrument.replace(/ \(.*\)/,""),
+      `<span class="tag ${s.strona==="LONG"?"long":"short"}">${s.strona}</span>`,
+      s.strategia, (+s.entry).toFixed(Math.abs(+s.entry)<10?5:2),
+      `<span class="${R_STATUS[s._status]||""}">${s._status}</span>`,
+      ["otwarty","brak_danych"].includes(s._status)&&!s._r ? "—" : fmtR(s._r),
+      s.tv||"—"]));
+}
+
+odswiez();
+setInterval(odswiez, 60000);
+</script>
+</body>
+</html>

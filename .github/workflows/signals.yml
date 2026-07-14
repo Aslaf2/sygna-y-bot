@@ -57,7 +57,7 @@ jobs:
             echo "--- skan $(date -u +%H:%M:%S) UTC (petla do +${MIN}min) ---"
             python smc_bot.py
             # zapisz stan tylko gdy sie zmienil (dedup przetrwa nawet gdy job sie urwie)
-            git add state.json sygnaly_log.csv
+            git add state.json sygnaly_log.csv run_stats.json wyniki.json
             if ! git diff --cached --quiet; then
               git commit -m "update state + log sygnalow" && git push || echo "push nieudany"
             fi
