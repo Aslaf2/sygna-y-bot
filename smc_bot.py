@@ -56,6 +56,12 @@ NO_SIGNAL_SYMS = {"^NDX"}
 # podnosi przewage metali z +0.35R do +0.54R/sygnal (win 45.5% -> 49.3%).
 SKIP_NY_HOURS = (10, 11)
 
+# Minimalny dystans SL w ATR. Dowod (14.07, live + backtest NIEZALEZNIE):
+# ryzyko <2 ATR = 12 sygnalow, 12 strat (stop w szumie 5m, wybijany knotem);
+# zdarzaly sie tez zdegenerowane sygnaly z SL 0.3-0.4$ na zlocie (szum+spread).
+# Odrzucenie <2 ATR: +0.50R -> +0.63R/sygnal, win 49.3% -> 52.9% (30d, spread).
+MIN_RISK_ATR = 2.0
+
 # TradingView - ocena techniczna (5m) doklejana do sygnalu i logowana,
 # zeby z czasem zmierzyc, czy zgodnosc z TV poprawia wyniki.
 TV_TA_MAP = {
@@ -565,6 +571,9 @@ def agent1_scout(df, now_ny):
                           ["strefa 62-79%", "reakcja nizdwiedzia", "trend down"])
                 if c:
                     cands.append(c)
+
+    # odsiew: stop blizej niz MIN_RISK_ATR = setup w szumie, nie wysylamy
+    cands = [c for c in cands if abs(c["entry"] - c["sl"]) >= MIN_RISK_ATR * a]
 
     kz = in_killzone(now_ny)
     side_count = {}
