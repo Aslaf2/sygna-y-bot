@@ -654,5 +654,29 @@
   "status": "SL",
   "r": -1.0,
   "rozliczono_utc": "2026-07-14T19:54:33.413279+00:00"
+ },
+ "2026-07-14T14:17:08.769127+00:00": {
+  "instrument": "US100 (Nasdaq)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "rozliczono_utc": "2026-07-14T20:09:31.565389+00:00"
+ },
+ "2026-07-14T18:58:30.358657+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "rozliczono_utc": "2026-07-14T20:09:31.566390+00:00"
+ },
+ "2026-07-14T19:18:50.160450+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "TP3",
+  "r": 2.7,
+  "rozliczono_utc": "2026-07-14T20:09:31.567389+00:00"
  }
 }

@@ -46,6 +46,16 @@ TD_MAP = {
 # prog 4 podnosi przewage calosci z +0.15R do +0.23R. Reszta zostaje na 3.
 MIN_SCORE = {"EURUSD=X": 4}
 
+# Sygnaly WYLACZONE per instrument (dane nadal pobierane - potrzebne do SETTLE).
+# Dowod (14.07, backtest 30d modelem R + 81 sygnalow live): US100 traci w obu
+# zbiorach (-0.23R/sygnal na n=45 backtest; -7.3R live) - wylaczony.
+NO_SIGNAL_SYMS = {"^NDX"}
+
+# Godziny NY, w ktorych NIE szukamy setupow. Dowod (14.07): killzone NY AM
+# (10-11) ma ~0R na backtescie 30d i -20.4R na 81 sygnalach live; wyciecie
+# podnosi przewage metali z +0.35R do +0.54R/sygnal (win 45.5% -> 49.3%).
+SKIP_NY_HOURS = (10, 11)
+
 # TradingView - ocena techniczna (5m) doklejana do sygnalu i logowana,
 # zeby z czasem zmierzyc, czy zgodnosc z TV poprawia wyniki.
 TV_TA_MAP = {
@@ -468,6 +478,8 @@ def build(side, entry, sl, strategy, reasons):
 
 
 def agent1_scout(df, now_ny):
+    if now_ny.hour in SKIP_NY_HOURS:
+        return []
     df = df.dropna().copy()
     if len(df) < EMA_LEN + SWING_LEN + 10:
         return []
@@ -693,6 +705,12 @@ def main():
                 time.sleep(2); continue
             dfs[sym] = df
             ins["bars"] = int(len(df))
+
+            if sym in NO_SIGNAL_SYMS:
+                print(f"{name}: sygnaly wylaczone")
+                ins["etap"] = "wylaczony"
+                ins["opis"] = "sygnaly wylaczone (traci: -0.23R/sygnal 30d, -7.3R live)"
+                time.sleep(1); continue
 
             dff = df.iloc[:-1]
             hdir = htf_from_5m(df)
