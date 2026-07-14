@@ -6,7 +6,11 @@
     "USD|JOLTS Job Openings|2026-06-30T10:00:00-04:00",
     "USD|President Trump Speaks|2026-07-01T15:15:00-04:00",
     "USD|FOMC Meeting Minutes|2026-07-08T14:00:00-04:00",
-    "USD|Unemployment Claims|2026-07-09T08:30:00-04:00"
+    "USD|Unemployment Claims|2026-07-09T08:30:00-04:00",
+    "USD|Core CPI m/m|2026-07-14T08:30:00-04:00",
+    "USD|Core CPI y/y|2026-07-14T08:30:00-04:00",
+    "USD|CPI m/m|2026-07-14T08:30:00-04:00",
+    "USD|CPI y/y|2026-07-14T08:30:00-04:00"
   ],
   "daily_summary": "2026-07-14",
   "sent_bars": {
