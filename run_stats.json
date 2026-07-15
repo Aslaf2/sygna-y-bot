@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-07-15T18:47:42.267885+00:00",
- "czas_pl": "15.07.2026 20:47",
+ "czas_utc": "2026-07-15T18:52:49.940685+00:00",
+ "czas_pl": "15.07.2026 20:52",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "cooldown",
@@ -15,15 +15,15 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2176
+   "bars": 2177
   },
   "EURUSD": {
-   "etap": "detect",
-   "kandydaci": 1,
+   "etap": "scan",
+   "kandydaci": 0,
    "zatwierdzone": 0,
    "wyslane": false,
-   "opis": "kandydaci odrzuceni przez walidator",
-   "bars": 2794
+   "opis": "brak setupu na ostatnich swiecach",
+   "bars": 2795
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -31,16 +31,10 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.23R/sygnal 30d, -7.3R live)",
-   "bars": 766
+   "bars": 767
   }
  },
  "historia": [
-  {
-   "t": "2026-07-14T20:30:30.673863+00:00",
-   "k": 1,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-07-14T20:35:38.306966+00:00",
    "k": 1,
@@ -1232,6 +1226,12 @@
   {
    "t": "2026-07-15T18:47:42.267885+00:00",
    "k": 1,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-07-15T18:52:49.940685+00:00",
+   "k": 0,
    "z": 0,
    "w": 0
   }
