@@ -11,7 +11,9 @@
     "USD|Core CPI y/y|2026-07-14T08:30:00-04:00",
     "USD|CPI m/m|2026-07-14T08:30:00-04:00",
     "USD|CPI y/y|2026-07-14T08:30:00-04:00",
-    "USD|Fed Chairman Warsh Testifies|2026-07-14T10:00:00-04:00"
+    "USD|Fed Chairman Warsh Testifies|2026-07-14T10:00:00-04:00",
+    "USD|Core PPI m/m|2026-07-15T08:30:00-04:00",
+    "USD|PPI m/m|2026-07-15T08:30:00-04:00"
   ],
   "daily_summary": "2026-07-15",
   "sent_bars": {
