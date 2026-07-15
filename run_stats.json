@@ -1,30 +1,29 @@
 {
- "czas_utc": "2026-07-15T18:22:01.079048+00:00",
- "czas_pl": "15.07.2026 20:22",
+ "czas_utc": "2026-07-15T18:27:09.332442+00:00",
+ "czas_pl": "15.07.2026 20:27",
  "instrumenty": {
   "XAUUSD (zloto)": {
-   "etap": "fill",
-   "kandydaci": 1,
-   "zatwierdzone": 1,
-   "wyslane": true,
-   "opis": "WYSLANO LONG (Silver Bullet, 3 pkt)",
-   "bars": 2173
+   "etap": "cooldown",
+   "kandydaci": 0,
+   "zatwierdzone": 0,
+   "wyslane": false,
+   "opis": "pauza po ostatnim sygnale"
   },
   "XAGUSD (srebro)": {
-   "etap": "scan",
-   "kandydaci": 0,
+   "etap": "detect",
+   "kandydaci": 1,
    "zatwierdzone": 0,
    "wyslane": false,
-   "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2171
+   "opis": "kandydaci odrzuceni przez walidator",
+   "bars": 2172
   },
   "EURUSD": {
-   "etap": "scan",
-   "kandydaci": 0,
+   "etap": "detect",
+   "kandydaci": 1,
    "zatwierdzone": 0,
    "wyslane": false,
-   "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2789
+   "opis": "kandydaci odrzuceni przez walidator",
+   "bars": 2790
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -32,7 +31,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.23R/sygnal 30d, -7.3R live)",
-   "bars": 761
+   "bars": 762
   }
  },
  "historia": [
@@ -1217,6 +1216,12 @@
    "k": 1,
    "z": 1,
    "w": 1
+  },
+  {
+   "t": "2026-07-15T18:27:09.332442+00:00",
+   "k": 2,
+   "z": 0,
+   "w": 0
   }
  ]
 }
