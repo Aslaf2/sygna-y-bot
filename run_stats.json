@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-07-17T17:58:45.588715+00:00",
- "czas_pl": "17.07.2026 19:58",
+ "czas_utc": "2026-07-17T18:03:52.391682+00:00",
+ "czas_pl": "17.07.2026 20:03",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "scan",
@@ -8,7 +8,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2371
+   "bars": 2372
   },
   "XAGUSD (srebro)": {
    "etap": "scan",
@@ -16,7 +16,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2369
+   "bars": 2370
   },
   "EURUSD": {
    "etap": "scan",
@@ -24,7 +24,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2802
+   "bars": 2803
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -32,16 +32,10 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.23R/sygnal 30d, -7.3R live)",
-   "bars": 756
+   "bars": 757
   }
  },
  "historia": [
-  {
-   "t": "2026-07-17T01:22:46.655715+00:00",
-   "k": 1,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-07-17T01:27:53.340597+00:00",
    "k": 0,
@@ -1232,6 +1226,12 @@
   },
   {
    "t": "2026-07-17T17:58:45.588715+00:00",
+   "k": 0,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-07-17T18:03:52.391682+00:00",
    "k": 0,
    "z": 0,
    "w": 0
