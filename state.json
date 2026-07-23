@@ -23,7 +23,8 @@
     "USD|Prelim UoM Inflation Expectations|2026-07-17T10:00:00-04:00",
     "USD|President Trump Speaks|2026-07-22T15:00:00-04:00",
     "EUR|Main Refinancing Rate|2026-07-23T08:15:00-04:00",
-    "EUR|Monetary Policy Statement|2026-07-23T08:15:00-04:00"
+    "EUR|Monetary Policy Statement|2026-07-23T08:15:00-04:00",
+    "USD|Unemployment Claims|2026-07-23T08:30:00-04:00"
   ],
   "daily_summary": "2026-07-23",
   "sent_bars": {
