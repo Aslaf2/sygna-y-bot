@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-07-24T05:25:10.612765+00:00",
- "czas_pl": "24.07.2026 07:25",
+ "czas_utc": "2026-07-24T05:30:16.809059+00:00",
+ "czas_pl": "24.07.2026 07:30",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "scan",
@@ -8,7 +8,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2205
+   "bars": 2206
   },
   "XAGUSD (srebro)": {
    "etap": "scan",
@@ -16,7 +16,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2204
+   "bars": 2206
   },
   "EURUSD": {
    "etap": "scan",
@@ -24,7 +24,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2651
+   "bars": 2652
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -36,12 +36,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-07-23T08:01:14.077499+00:00",
-   "k": 1,
-   "z": 1,
-   "w": 1
-  },
   {
    "t": "2026-07-23T08:06:21.001567+00:00",
    "k": 0,
@@ -1232,6 +1226,12 @@
   },
   {
    "t": "2026-07-24T05:25:10.612765+00:00",
+   "k": 0,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-07-24T05:30:16.809059+00:00",
    "k": 0,
    "z": 0,
    "w": 0
