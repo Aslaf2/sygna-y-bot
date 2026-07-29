@@ -49,6 +49,11 @@
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   @media(max-width:700px){.cols{grid-template-columns:1fr}.panel .val.big{font-size:30px}}
   #err{color:var(--red);margin-bottom:10px;display:none}
+  .switch{display:flex;gap:6px;margin-bottom:12px}
+  .switch button{background:#0e1420;border:1px solid #1c2430;color:#5a6a7d;font:inherit;
+    font-size:11px;letter-spacing:1px;padding:6px 12px;border-radius:6px;cursor:pointer}
+  .switch button.on{color:#ffb84d;border-color:#ffb84d}
+  .switch .note{font-size:11px;color:#5a6a7d;align-self:center;margin-left:6px}
 </style>
 </head>
 <body>
@@ -59,6 +64,12 @@
     <span class="sub" id="lastscan" style="margin-left:auto">—</span>
   </div>
   <div id="err"></div>
+
+  <div class="switch">
+    <button id="btn-akt" class="on" onclick="ustawWidok('aktualny')">AKTUALNY BOT</button>
+    <button id="btn-hist" onclick="ustawWidok('historia')">CAŁA HISTORIA</button>
+    <span class="note" id="widok-note">sygnały wg dzisiejszych filtrów (bez US100 / EURUSD@3pkt / NY AM / niezgodnych z TV)</span>
+  </div>
 
   <div class="grid" id="tiles"></div>
 
@@ -168,21 +179,58 @@ function tabela(el, naglowki, wiersze){
     wiersze.map(w=>"<tr>"+w.map(c=>`<td>${c}</td>`).join("")+"</tr>").join("");
 }
 
+let widok = "aktualny";
+function ustawWidok(w){
+  widok = w;
+  document.getElementById("btn-akt").classList.toggle("on", w==="aktualny");
+  document.getElementById("btn-hist").classList.toggle("on", w==="historia");
+  document.getElementById("widok-note").textContent = w==="aktualny"
+    ? "sygnały wg dzisiejszych filtrów (bez US100 / EURUSD@3pkt / NY AM / niezgodnych z TV)"
+    : "wszystkie sygnały od startu, także z instrumentów i godzin już wyciętych";
+  odswiez();
+}
+
+function godzinaNY(iso){
+  try{
+    return +new Date(iso).toLocaleString("en-US",
+      {timeZone:"America/New_York", hour:"2-digit", hour12:false});
+  }catch(e){ return -1; }
+}
+
+function tvZgodny(tv, strona){
+  if (!tv) return true;               // era sprzed integracji TV - neutralnie
+  const k = tv.split(" ")[0].replace("STRONG_","");
+  if (k==="BUY")  return strona==="LONG";
+  if (k==="SELL") return strona==="SHORT";
+  return false;                       // NEUTRAL
+}
+
+// te same filtry, ktore dzis obowiazuja w smc_bot.py
+function aktualnaKonfig(s){
+  const ins = s.instrument.split(" ")[0];
+  if (ins==="US100") return false;
+  if (ins==="EURUSD" && s.score!=="4") return false;
+  const h = godzinaNY(s.swieca);
+  if (h===10 || h===11) return false;
+  return tvZgodny(s.tv, s.strona);
+}
+
 async function odswiez(){
   const [csv, wyniki, stats] = await Promise.all([
     pobierz("sygnaly_log.csv"), pobierz("wyniki.json",true), pobierz("run_stats.json",true)]);
   const err = document.getElementById("err");
   if (!csv){ err.style.display="block"; err.textContent="Nie udało się pobrać danych (sprawdź internet / repo)."; return; }
   err.style.display="none";
-  const sygnaly = csvParse(csv);
+  const wszystkie = csvParse(csv);
   const wy = wyniki||{};
 
   // polacz sygnal + wynik
-  sygnaly.forEach(s=>{
+  wszystkie.forEach(s=>{
     const w = wy[s.data_utc];
     s._status = w ? w.status : "otwarty";
     s._r = w ? (w.r||0) : 0;
   });
+  const sygnaly = widok==="aktualny" ? wszystkie.filter(aktualnaKonfig) : wszystkie;
   const rozliczone = sygnaly.filter(s=>["SL","TP1+BE","TP2+BE","TP3"].includes(s._status));
   const otwarte    = sygnaly.filter(s=>s._status==="otwarty");
   const sumR  = rozliczone.reduce((a,s)=>a+s._r,0);
