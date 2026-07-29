@@ -27,9 +27,20 @@ DRY_RUN = os.getenv("DRY_RUN", "") == "1"
 SYMBOLS = [
     ("XAUUSD (zloto)",  "GC=F",     ["USD"]),
     ("XAGUSD (srebro)", "SI=F",     ["USD"]),
+    ("BRENT (ropa)",    "BZ=F",     ["USD"]),
     ("EURUSD",          "EURUSD=X", ["USD", "EUR"]),
     ("US100 (Nasdaq)",  "^NDX",     ["USD"]),
 ]
+# BRENT dodany 29.07.2026 po przegladzie 17 rynkow tym samym silnikiem
+# (uniwersum.py, 60 dni, rozliczenie 3R ze spreadem). Brent: n=93, +0.56R/sygnal,
+# win 40%, obie polowki probki dodatnie (+0.79/+0.33), 22 zyskowne dni na 42,
+# 1.4 sygnalu dziennie. Odrzucone jako ujemne albo niespojne: miedz, platyna,
+# gaz, GBPUSD, USDJPY, AUDUSD, BTC, ETH, S&P/Nasdaq/Dow futures.
+# WTI (CL=F) ma podobny wynik (+0.43R), ale 72% jego sygnalow pada w tej samej
+# godzinie i tym samym kierunku co Brent - to ten sam zaklad, wiec bierzemy JEDEN.
+# UWAGA: darmowe API TradingView nie ma ropy pod zadna ze sprawdzonych nazw,
+# wiec Brent dziala BEZ filtra TV (tv_info zwroci None -> przepuszczamy).
+# Backtest liczony byl tak samo, bez TV, wiec liczba +0.56R jest z tym zgodna.
 
 # Zapasowe zrodlo danych (Twelve Data) - dziala z serwerow chmurowych, gdy Yahoo
 # blokuje GitHub Actions. Wlacza sie tylko gdy ustawiony sekret TD_KEY.
@@ -37,6 +48,7 @@ TD_KEY = os.getenv("TD_KEY", "")
 TD_MAP = {
     "GC=F":     "XAU/USD",
     "SI=F":     "XAG/USD",
+    "BZ=F":     "BRENT",
     "EURUSD=X": "EUR/USD",
     "^NDX":     "NDX",
 }
