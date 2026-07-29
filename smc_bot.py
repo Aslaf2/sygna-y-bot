@@ -272,6 +272,30 @@ def _settle_one(row, df):
     return ("otwarty", [0.0, 1.0, 1.9][phase])
 
 
+STATUS_EMOJI = {"SL": "\U0001F534", "TP1+BE": "\U0001F3AF",
+                "TP2+BE": "✅", "TP3": "\U0001F48E"}
+
+
+def _notify_settle(row, prev, status, r):
+    """Powiadomienie na Telegram, gdy WYSLANY sygnal sie rozliczy albo osiagnie
+    kolejny TP (pozycja dalej otwarta). Tylko sygnaly z ostatnich 72h - starsze
+    rozliczenia to backfill, nie spamujemy."""
+    try:
+        wiek = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(row["data_utc"])
+        if wiek.total_seconds() > 72 * 3600:
+            return
+        naglowek = f'{row["instrument"]} {row["strona"]} z {row["data_pl"]}'
+        if status != "otwarty":
+            e = STATUS_EMOJI.get(status, "")
+            send_telegram(f"{e} SYGNAL ROZLICZONY: {status} ({r:+.1f}R)\n{naglowek}" + stopka())
+        elif r > ((prev or {}).get("r", 0)) + 1e-9:
+            poziom = "TP2" if r > 1.0 else "TP1"
+            send_telegram(f"\U0001F3AF {poziom} OSIAGNIETY (+{r:.1f}R zabezpieczone)\n{naglowek}\n"
+                          "SL przesuniety na wejscie - reszta pozycji gra dalej." + stopka())
+    except Exception as e:
+        print("notify_settle blad:", e)
+
+
 def settle_signals(dfs, log_file=LOG_FILE, wyniki_file=WYNIKI_FILE):
     """SETTLE: rozlicza sygnaly z CSV na danych pobranych w tym biegu (zero
     dodatkowych zapytan do Yahoo). Wyniki (R) w wyniki.json, klucz = data_utc.
@@ -312,6 +336,8 @@ def settle_signals(dfs, log_file=LOG_FILE, wyniki_file=WYNIKI_FILE):
                        "strategia": row["strategia"], "status": status, "r": round(r, 4),
                        "rozliczono_utc": dt.datetime.now(dt.timezone.utc).isoformat()}
         changed = True
+        if wyniki_file == WYNIKI_FILE:
+            _notify_settle(row, prev, status, r)
     if changed:
         save_json(wyniki_file, wyniki)
         print(f"settle: zaktualizowano {wyniki_file}")
@@ -369,6 +395,53 @@ def fmt_event(ev):
     local = ev["when"].astimezone(TZ_PL).strftime("%d.%m %H:%M")
     flag = "\U0001F534" if ev["impact"] == "High" else "\U0001F7E0"
     return f"{flag} {local} {ev['country']} - {ev['title']}"
+
+
+def _dzien_pl(klucz_utc):
+    try:
+        return dt.datetime.fromisoformat(klucz_utc).astimezone(TZ_PL).date()
+    except Exception:
+        return None
+
+
+def daily_report(state):
+    """Wieczorny raport dnia na Telegram (po 22:00 PL, raz dziennie): dzisiejsze
+    sygnaly z wynikami, bilans R (dzis / 7 dni / od startu) i efekt filtra TV.
+    Zwraca True gdy zmienil stan (dedup po dacie)."""
+    now = dt.datetime.now(TZ_PL)
+    today = now.date().isoformat()
+    if now.hour < 22 or state.get("daily_report") == today:
+        return False
+    state["daily_report"] = today
+    wyniki = load_json(WYNIKI_FILE, {})
+    cien = load_json(TVGATE_WYNIKI, {})
+    dzis = {k: v for k, v in wyniki.items() if str(_dzien_pl(k)) == today}
+    cien_dzis = {k: v for k, v in cien.items() if str(_dzien_pl(k)) == today}
+    if not dzis and not cien_dzis:
+        return True   # cichy dzien - nie spamujemy, ale date odhaczamy
+
+    def suma(d, dni=None):
+        gr = now.date() - dt.timedelta(days=dni) if dni else None
+        return sum(v.get("r", 0) for k, v in d.items()
+                   if v.get("status") not in ("otwarty", "brak_danych")
+                   and (gr is None or (_dzien_pl(k) or gr) >= gr))
+
+    linie = [f"\U0001F4CA RAPORT DNIA ({now.strftime('%d.%m')})",
+             f"Sygnaly wyslane dzis: {len(dzis)}"]
+    for k in sorted(dzis):
+        v = dzis[k]
+        e = STATUS_EMOJI.get(v["status"], "⏳")
+        godz = dt.datetime.fromisoformat(k).astimezone(TZ_PL).strftime("%H:%M")
+        wyn = v["status"] if v["status"] != "otwarty" else "otwarty"
+        linie.append(f"{e} {godz} {v['instrument']} {v['strona']} -> {wyn} ({v.get('r', 0):+.1f}R)")
+    linie.append(f"Bilans R: dzis {suma(dzis):+.1f} | 7 dni {suma(wyniki, 7):+.1f} "
+                 f"| od startu {suma(wyniki):+.1f}")
+    if cien:
+        linie.append(f"\U0001F6E1 Filtr TV: dzis zatrzymal {len(cien_dzis)}, "
+                     f"lacznie {len(cien)} (wynik cienia: {suma(cien):+.1f}R - "
+                     "im bardziej ujemny, tym wiecej strat unikniete)")
+    send_telegram("\n".join(linie) + stopka())
+    return True
 
 
 def daily_summary(events):
@@ -842,6 +915,13 @@ def main():
         save_run_stats(run_stats)
     except Exception as e:
         print("run_stats: blad ->", e)
+
+    # RAPORT DNIA - wieczorne podsumowanie na Telegram
+    try:
+        if daily_report(state):
+            changed = True
+    except Exception as e:
+        print("raport dnia: blad ->", e)
 
     # ALARM: brak danych rynkowych (np. Yahoo blokuje chmure) - zeby nie bylo
     # "zielono, ale niemo". Wysylany najwyzej raz na 3h.
