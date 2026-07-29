@@ -99,14 +99,16 @@
 
   <div class="foot">
     ⚠ Sygnały <b>papierowe</b> — bot analizuje i wysyła sygnały na Telegram, nie handluje pieniędzmi.
-    Wyniki w <b>R</b> (1R = ryzyko od wejścia do SL) wg planu z wiadomości: 50% na TP1 → SL na wejście, 30% na TP2, 20% na TP3.
+    Wyniki w <b>R</b> (1R = ryzyko od wejścia do SL) wg planu z wiadomości: <b>cała pozycja trzymana do TP=+3R albo do SL=−1R</b>,
+    bez częściowych zamknięć i bez przesuwania SL (test na 58 sygnałach: +0.47R/sygnał wobec +0.31R starego planu 50/30/20).
     Rozliczenie ostrożne: gdy SL i TP wypadają w tej samej świecy, liczony jest SL.
     Dane: Yahoo Finance (metale = futures). Odświeżanie co 60 s.
   </div>
 
 <script>
 const RAW = "https://raw.githubusercontent.com/Aslaf2/sygna-y-bot/main/";
-const R_STATUS = {"SL":"st-sl","TP1+BE":"st-be","TP2+BE":"st-be","TP3":"st-tp","otwarty":"st-open","brak_danych":"st-nd"};
+const R_STATUS = {"SL":"st-sl","TP":"st-tp","TP1+BE":"st-be","TP2+BE":"st-be","TP3":"st-tp","otwarty":"st-open","brak_danych":"st-nd"};
+const ZAMKNIETE = ["SL","TP","TP1+BE","TP2+BE","TP3"];
 
 async function pobierz(plik, jakoJson){
   // najpierw plik obok dashboardu (serwer lokalny / GitHub Pages), potem raw z GitHuba
@@ -231,7 +233,7 @@ async function odswiez(){
     s._r = w ? (w.r||0) : 0;
   });
   const sygnaly = widok==="aktualny" ? wszystkie.filter(aktualnaKonfig) : wszystkie;
-  const rozliczone = sygnaly.filter(s=>["SL","TP1+BE","TP2+BE","TP3"].includes(s._status));
+  const rozliczone = sygnaly.filter(s=>ZAMKNIETE.includes(s._status));
   const otwarte    = sygnaly.filter(s=>s._status==="otwarty");
   const sumR  = rozliczone.reduce((a,s)=>a+s._r,0);
   const wins  = rozliczone.filter(s=>s._r>0).length;
@@ -243,7 +245,7 @@ async function odswiez(){
          `przy ryzyku 100 zł/sygnał ≈ <b>${(sumR*100).toFixed(0)} zł</b>`) +
     tile("Sygnały", sygnaly.length, "", `rozliczone: ${rozliczone.length} · otwarte: ${otwarte.length}`) +
     tile("Win rate", wr.toFixed(0)+"%", wr>=50?"pos":"neg", `${wins}/${rozliczone.length} zyskownych`) +
-    tile("Śr. R / sygnał", fmtR(avg), avg>=0?"pos":"neg", "TP1=+1R · TP2=+1.9R · TP3=+2.7R · SL=−1R");
+    tile("Śr. R / sygnał", fmtR(avg), avg>=0?"pos":"neg", "cała pozycja: TP=+3R · SL=−1R");
 
   // pipeline z ostatniego skanu
   const inst = stats ? stats.instrumenty||{} : {};

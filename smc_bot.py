@@ -79,6 +79,12 @@ ATR_LEN   = 14
 SL_BUF    = 0.5
 RR_TP1    = 2.0
 RR_TP2    = 3.0
+# JEDEN cel zamiast czesciowych wyjsc - cala pozycja do 3R albo do SL.
+# Dowod: sweep 1.5-6R na 58 sygnalach live (ze spreadem) ma gladki szczyt na 3R:
+# 2.0R=+0.20, 2.5R=+0.29, 3.0R=+0.47, 3.5R=+0.35, 4.0R=+0.16 R/sygnal;
+# stary plan 50/30/20 z SL na BE daje +0.31. Przewaga w obu polowkach probki
+# (starsza +0.89 vs +0.66, nowsza +0.06 vs -0.05) i na obu metalach.
+RR_TP     = 3.0
 FVG_LOOKBACK = 8
 APPROVE_SCORE = 3
 # 2 swiece = sygnal maks. ~10 min od zamkniecia swiecy sygnalowej. Dowod (log
@@ -226,17 +232,24 @@ def save_json(path, data):
         json.dump(data, f, indent=1, ensure_ascii=False)
 
 
+MODEL_ROZLICZEN = "3R"    # wersja modelu wyjscia; zmiana wymusza przeliczenie wynikow
+
+
 def _settle_one(row, df):
-    """Rozlicza jeden sygnal na swiecach 5m. Model = plan z wiadomosci Telegram:
-    50% na TP1 (potem SL na wejscie), 30% na TP2, 20% na TP3.
-    Ostroznie: gdy SL i TP wypadaja w tej samej swiecy, liczymy SL - z wyjatkiem
-    swiecy, w ktorej wlasnie osiagnieto TP (tam nie wybijamy na swiezo
-    przesunietym SL, bo cena przeszla przez wejscie wczesniej w tej swiecy).
+    """Rozlicza jeden sygnal na swiecach 5m. Model: CALA pozycja trzymana do
+    TP=3R albo do SL=-1R. Bez czesciowych zamkniec i bez SL-na-wejscie.
+    Dowod (58 sygnalow live w aktualnej konfiguracji, dane 5m, spread wliczony):
+    ten plan daje +0.47R/sygnal wobec +0.31R planu 50/30/20 z SL na BE; przewaga
+    wystepuje w obu polowkach probki i na obu metalach, a sweep celu 1.5-6R ma
+    gladki szczyt na 3R (2.5R=+0.29, 3.5R=+0.35) - to nie pojedynczy pik.
+    Ostroznie: gdy SL i TP wypadaja w tej samej swiecy, liczymy SL.
     Zwraca (status, wynik_R) albo None, gdy dane nie obejmuja sygnalu."""
     lng = row["strona"] == "LONG"
-    entry = float(row["entry"])
-    tp1, tp2, tp3 = float(row["tp1"]), float(row["tp2"]), float(row["tp3"])
-    stop = float(row["sl"])
+    entry, stop = float(row["entry"]), float(row["sl"])
+    risk = abs(entry - stop)
+    if risk <= 0:
+        return None
+    tp = entry + (RR_TP * risk if lng else -RR_TP * risk)
     t0 = pd.to_datetime(row["swieca"], utc=True)
     if df.empty:
         return None
@@ -248,50 +261,34 @@ def _settle_one(row, df):
     bars = df[df.index > t0]  # wejscie na zamknieciu swiecy sygnalowej
     if bars.empty:
         return ("otwarty", 0.0)
-    phase = 0                 # 0=pelna pozycja, 1=po TP1 (SL=BE), 2=po TP2
     for hi, lo in zip(bars["High"].values, bars["Low"].values):
         hi, lo = float(hi), float(lo)
-        upgraded = False
-        while True:
-            stop_hit = (lo <= stop) if lng else (hi >= stop)
-            if stop_hit and not upgraded:
-                if phase == 0:
-                    return ("SL", -1.0)
-                if phase == 1:
-                    return ("TP1+BE", 1.0)
-                return ("TP2+BE", 1.9)
-            if phase == 0 and ((hi >= tp1) if lng else (lo <= tp1)):
-                phase, stop, upgraded = 1, entry, True
-                continue
-            if phase == 1 and ((hi >= tp2) if lng else (lo <= tp2)):
-                phase, upgraded = 2, True
-                continue
-            if phase == 2 and ((hi >= tp3) if lng else (lo <= tp3)):
-                return ("TP3", 2.7)
-            break
-    return ("otwarty", [0.0, 1.0, 1.9][phase])
+        if (lo <= stop) if lng else (hi >= stop):
+            return ("SL", -1.0)
+        if (hi >= tp) if lng else (lo <= tp):
+            return ("TP", float(RR_TP))
+    return ("otwarty", 0.0)
 
 
-STATUS_EMOJI = {"SL": "\U0001F534", "TP1+BE": "\U0001F3AF",
-                "TP2+BE": "✅", "TP3": "\U0001F48E"}
+STATUS_EMOJI = {"SL": "\U0001F534", "TP": "\U0001F48E",
+                "TP1+BE": "\U0001F3AF", "TP2+BE": "✅", "TP3": "\U0001F48E"}
 
 
 def _notify_settle(row, prev, status, r):
-    """Powiadomienie na Telegram, gdy WYSLANY sygnal sie rozliczy albo osiagnie
-    kolejny TP (pozycja dalej otwarta). Tylko sygnaly z ostatnich 72h - starsze
-    rozliczenia to backfill, nie spamujemy."""
+    """Powiadomienie na Telegram, gdy WYSLANY sygnal sie zamknie (TP albo SL).
+    Tylko sygnaly z ostatnich 72h - starsze rozliczenia to backfill, nie spamujemy."""
     try:
         wiek = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(row["data_utc"])
         if wiek.total_seconds() > 72 * 3600:
             return
         naglowek = f'{row["instrument"]} {row["strona"]} z {row["data_pl"]}'
-        if status != "otwarty":
+        if status == "TP":
+            send_telegram(f"\U0001F48E CEL OSIAGNIETY: TP +{r:.0f}R\n{naglowek}" + stopka())
+        elif status == "SL":
+            send_telegram(f"\U0001F534 SYGNAL ZAMKNIETY: SL (-1R)\n{naglowek}" + stopka())
+        elif status not in ("otwarty", "brak_danych"):
             e = STATUS_EMOJI.get(status, "")
             send_telegram(f"{e} SYGNAL ROZLICZONY: {status} ({r:+.1f}R)\n{naglowek}" + stopka())
-        elif r > ((prev or {}).get("r", 0)) + 1e-9:
-            poziom = "TP2" if r > 1.0 else "TP1"
-            send_telegram(f"\U0001F3AF {poziom} OSIAGNIETY (+{r:.1f}R zabezpieczone)\n{naglowek}\n"
-                          "SL przesuniety na wejscie - reszta pozycji gra dalej." + stopka())
     except Exception as e:
         print("notify_settle blad:", e)
 
@@ -313,7 +310,9 @@ def settle_signals(dfs, log_file=LOG_FILE, wyniki_file=WYNIKI_FILE):
     for row in rows:
         key = row["data_utc"]
         prev = wyniki.get(key)
-        if prev and prev.get("status") != "otwarty":
+        # gotowe wyniki pomijamy - chyba ze policzono je starszym modelem wyjscia
+        if (prev and prev.get("status") != "otwarty"
+                and prev.get("model") == MODEL_ROZLICZEN):
             continue
         df = dfs.get(NAME2SYM.get(row["instrument"]))
         if df is None or df.empty:
@@ -324,19 +323,25 @@ def settle_signals(dfs, log_file=LOG_FILE, wyniki_file=WYNIKI_FILE):
             print("settle: blad", key, "->", e)
             continue
         if res is None:
+            # brak danych: NIE kasujemy wyniku policzonego wczesniej
             if prev is None:
                 wyniki[key] = {"instrument": row["instrument"], "strona": row["strona"],
-                               "strategia": row["strategia"], "status": "brak_danych", "r": 0.0}
+                               "strategia": row["strategia"], "status": "brak_danych",
+                               "r": 0.0, "model": MODEL_ROZLICZEN}
                 changed = True
             continue
         status, r = res
-        if prev and prev.get("status") == status and abs(prev.get("r", 0) - r) < 1e-9:
+        bez_zmian = (prev and prev.get("status") == status
+                     and abs(prev.get("r", 0) - r) < 1e-9)
+        if bez_zmian and prev.get("model") == MODEL_ROZLICZEN:
             continue
         wyniki[key] = {"instrument": row["instrument"], "strona": row["strona"],
                        "strategia": row["strategia"], "status": status, "r": round(r, 4),
+                       "model": MODEL_ROZLICZEN,
                        "rozliczono_utc": dt.datetime.now(dt.timezone.utc).isoformat()}
         changed = True
-        if wyniki_file == WYNIKI_FILE:
+        # tylko realna zmiana wyniku warta powiadomienia (nie samo przestemplowanie)
+        if wyniki_file == WYNIKI_FILE and not bez_zmian:
             _notify_settle(row, prev, status, r)
     if changed:
         save_json(wyniki_file, wyniki)
@@ -729,10 +734,11 @@ def fmt_signal(name, cand, score, why, news, tv=None, delta=None):
            f"----------------------\n"
            f"Wejscie: {cand['entry'] + off:.{d}f}\n"
            f"SL: {cand['sl'] + off:.{d}f}\n"
-           f"TP1: {cand['tp1'] + off:.{d}f}  ← zamknij 50% i przesun SL na wejscie\n"
-           f"TP2: {cand['tp2'] + off:.{d}f}  ← zamknij 30%\n"
-           f"TP3: {tp3 + off:.{d}f}  ← zamknij reszte (20%)\n"
-           f"\U0001F4A1 Po TP1 pozycja jest bez ryzyka (SL na wejsciu)\n"
+           f"TP: {cand['entry'] + (risk * RR_TP if cand['side'] == 'LONG' else -risk * RR_TP) + off:.{d}f}"
+           f"  ← zamknij CALOSC ({RR_TP:.0f}R)\n"
+           f"\U0001F4A1 Jeden cel, jeden stop - bez czesciowych zamkniec i bez\n"
+           f"   przesuwania SL. Tak wychodzi najlepiej w testach na 58 sygnalach\n"
+           f"   (+0.47R/sygnal wobec +0.31R starego planu 50/30/20).\n"
            f"\U00002705 Agent2 ({score} pkt): " + ", ".join(why) + "\n"
            f"\U0001F50E Agent1: " + ", ".join(cand["reasons"]))
     if delta is not None:
