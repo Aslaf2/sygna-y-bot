@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-07-29T07:39:31.880610+00:00",
- "czas_pl": "29.07.2026 09:39",
+ "czas_utc": "2026-07-29T07:44:38.249296+00:00",
+ "czas_pl": "29.07.2026 09:44",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "scan",
@@ -8,23 +8,23 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2039
+   "bars": 2040
   },
   "XAGUSD (srebro)": {
+   "etap": "fill",
+   "kandydaci": 1,
+   "zatwierdzone": 1,
+   "wyslane": true,
+   "opis": "WYSLANO LONG (Silver Bullet, 3 pkt)",
+   "bars": 2041
+  },
+  "EURUSD": {
    "etap": "scan",
    "kandydaci": 0,
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2040
-  },
-  "EURUSD": {
-   "etap": "detect",
-   "kandydaci": 1,
-   "zatwierdzone": 0,
-   "wyslane": false,
-   "opis": "kandydaci odrzuceni przez walidator",
-   "bars": 2660
+   "bars": 2661
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -36,12 +36,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-07-28T09:01:06.618291+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-07-28T09:06:12.981856+00:00",
    "k": 1,
@@ -1235,6 +1229,12 @@
    "k": 1,
    "z": 0,
    "w": 0
+  },
+  {
+   "t": "2026-07-29T07:44:38.249296+00:00",
+   "k": 1,
+   "z": 1,
+   "w": 1
   }
  ]
 }
