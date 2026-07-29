@@ -95,6 +95,12 @@ STATE_FILE      = "state.json"
 LOG_FILE        = "sygnaly_log.csv"   # historia WYSLANYCH sygnalow (do Excela z wynikami)
 RUN_STATS_FILE  = "run_stats.json"    # statystyki kazdego skanu (dashboard: Scan->Fill)
 WYNIKI_FILE     = "wyniki.json"       # rozliczenia TP/SL wyslanych sygnalow (dashboard: Settle)
+# Filtr TV: sygnal idzie na Telegram tylko gdy ocena TradingView wspiera kierunek.
+# Odrzucone NIE znikaja - trafiaja do plikow "cienia" i sa dalej rozliczane,
+# zeby zbierac dowod czy filtr pomaga (ocen TV nie da sie backtestowac wstecz).
+TV_GATE         = True
+TVGATE_LOG      = "sygnaly_odrzucone_tv.csv"
+TVGATE_WYNIKI   = "wyniki_odrzucone_tv.json"
 
 NAME2SYM = {name: sym for name, sym, _ in SYMBOLS}
 
@@ -170,14 +176,29 @@ def tv_rating(sym):
     return info["rating"] if info else None
 
 
-def log_signal(name, cand, score, bar_time, tv=None, spot_delta=None):
+def tv_zgodny(tv, side):
+    """Czy ocena TV wspiera kierunek sygnalu. None = TV niedostepne (nie blokujemy,
+    bot ma dzialac takze gdy TV padnie). Dowod live 02-29.07 (n=76 rozliczonych):
+    zgodne +0.01R/szt, przeciwne -0.21R/szt, NEUTRAL 6/6 SL."""
+    if not tv:
+        return None
+    kier = tv.split()[0].replace("STRONG_", "")
+    if kier == "BUY":
+        return side == "LONG"
+    if kier == "SELL":
+        return side == "SHORT"
+    return False
+
+
+def log_signal(name, cand, score, bar_time, tv=None, spot_delta=None, plik=LOG_FILE):
     """Dopisuje WYSLANY sygnal do CSV (do pozniejszego Excela z wynikami).
-    TP3 = 4R liczone tu (wiadomosc pokazuje TP1/TP2, log trzyma tez TP3)."""
+    TP3 = 4R liczone tu (wiadomosc pokazuje TP1/TP2, log trzyma tez TP3).
+    plik=TVGATE_LOG zapisuje sygnal-cien wstrzymany przez filtr TV."""
     risk = abs(cand["entry"] - cand["sl"])
     tp3 = cand["entry"] + (4 * risk if cand["side"] == "LONG" else -4 * risk)
-    nowe = not os.path.exists(LOG_FILE)
+    nowe = not os.path.exists(plik)
     try:
-        with open(LOG_FILE, "a", newline="", encoding="utf-8") as f:
+        with open(plik, "a", newline="", encoding="utf-8") as f:
             w = csv.writer(f)
             if nowe:
                 w.writerow(["data_pl", "data_utc", "instrument", "strona", "strategia",
@@ -251,15 +272,16 @@ def _settle_one(row, df):
     return ("otwarty", [0.0, 1.0, 1.9][phase])
 
 
-def settle_signals(dfs):
+def settle_signals(dfs, log_file=LOG_FILE, wyniki_file=WYNIKI_FILE):
     """SETTLE: rozlicza sygnaly z CSV na danych pobranych w tym biegu (zero
-    dodatkowych zapytan do Yahoo). Wyniki (R) w wyniki.json, klucz = data_utc."""
-    if not os.path.exists(LOG_FILE):
+    dodatkowych zapytan do Yahoo). Wyniki (R) w wyniki.json, klucz = data_utc.
+    Wolane tez dla plikow cienia (sygnaly wstrzymane przez filtr TV)."""
+    if not os.path.exists(log_file):
         return
-    wyniki = load_json(WYNIKI_FILE, {})
+    wyniki = load_json(wyniki_file, {})
     changed = False
     try:
-        with open(LOG_FILE, encoding="utf-8") as f:
+        with open(log_file, encoding="utf-8") as f:
             rows = list(csv.DictReader(f))
     except Exception as e:
         print("settle: blad odczytu CSV:", e)
@@ -291,8 +313,8 @@ def settle_signals(dfs):
                        "rozliczono_utc": dt.datetime.now(dt.timezone.utc).isoformat()}
         changed = True
     if changed:
-        save_json(WYNIKI_FILE, wyniki)
-        print("settle: zaktualizowano wyniki.json")
+        save_json(wyniki_file, wyniki)
+        print(f"settle: zaktualizowano {wyniki_file}")
 
 
 def save_run_stats(stats):
@@ -785,6 +807,17 @@ def main():
                         delta = dlt
                 except Exception:
                     pass
+            if TV_GATE and tv_zgodny(tv, c["side"]) is False:
+                # sygnal-cien: nie wysylamy, ale logujemy i rozliczamy jak zwykly,
+                # zeby dalej zbierac dowod skutecznosci filtra
+                log_signal(name, c, score, bar_time, tv, delta, plik=TVGATE_LOG)
+                seen.append(bar_time)
+                sent_bars[sym] = seen[-120:]
+                changed = True
+                ins["etap"] = "validate"
+                ins["opis"] = f"wstrzymany przez filtr TV ({tv.split()[0]})"
+                print(f"{name}: WSTRZYMANY przez filtr TV ({tv})")
+                continue
             send_telegram(fmt_signal(name, c, score, why, news, tv, delta))
             log_signal(name, c, score, bar_time, tv, delta)
             seen.append(bar_time)
@@ -802,6 +835,7 @@ def main():
     # SETTLE - rozliczenie wyslanych sygnalow na danych z tego biegu
     try:
         settle_signals(dfs)
+        settle_signals(dfs, TVGATE_LOG, TVGATE_WYNIKI)
     except Exception as e:
         print("settle: blad ->", e)
     try:
