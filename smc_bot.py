@@ -591,8 +591,23 @@ def last_ob(opens, closes, highs, lows, i, direction):
 
 
 def in_killzone(now_ny):
+    """Okna, w ktorych powstaje Silver Bullet (czas NY). Sesja AZJATYCKA
+    (20:00-21:00 NY = otwarcie Tokio, 02:00-03:00 w Polsce) dodana 30.07.2026.
+
+    Dowod (eksperyment8.py: jeden przebieg po CALEJ dobie z udawana killzone
+    w kazdej godzinie, 60 dni, 3 instrumenty, rozliczenie 3R ze spreadem):
+      Azja 20-21    n=126  +59.1R  +0.47R/szt  win 38%  polowki +0.60/+0.34
+      NY PM 14-15   n=111  +60.4R  +0.54R/szt  win 40%  polowki +0.64/+0.45
+      Londyn 3-4    n=123  +36.6R  +0.30R/szt  win 33%  polowki +0.61/-0.01
+    Azja dziala na kazdym instrumencie osobno (zloto +0.41, srebro +0.46,
+    Brent +0.53) i nie jest samotnym pikiem - sasiednie godziny 19 i 21 tez
+    sa dodatnie (+0.30 i +0.28). Calosc: +97.0R -> +156.1R, czyli +61%.
+    Godzin 19 i 21 NIE dodano: ich druga polowa probki jest plaska/ujemna.
+    Okno 10-11 zostaje w liscie, ale SKIP_NY_HOURS i tak je wycina.
+    """
     t = now_ny.hour * 60 + now_ny.minute
-    zones = [(3 * 60, 4 * 60), (10 * 60, 11 * 60), (14 * 60, 15 * 60)]
+    zones = [(3 * 60, 4 * 60), (10 * 60, 11 * 60),
+             (14 * 60, 15 * 60), (20 * 60, 21 * 60)]
     return any(a <= t <= b for a, b in zones)
 
 
