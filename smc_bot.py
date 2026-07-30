@@ -124,9 +124,14 @@ NAME2SYM = {name: sym for name, sym, _ in SYMBOLS}
 
 
 def send_telegram(text):
+    """Wysylka na Telegram. Loguje TEZ pierwsza linie wiadomosci - bez tego
+    w logach chmury widac tylko 'dostarczono' i nie da sie stwierdzic, co
+    wlasciwie poszlo (przy diagnozie raportu dnia kosztowalo to duzo czasu)."""
+    czego = text.strip().splitlines()[0][:60] if text.strip() else "?"
     if DRY_RUN:
         print("----- (DRY_RUN) -----\n" + text + "\n")
         return
+    print(f"Telegram -> wysylam: {czego}")
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     for chat in [c.strip() for c in CHAT_ID.split(",") if c.strip()]:
         try:
@@ -422,41 +427,52 @@ def _dzien_pl(klucz_utc):
 
 
 def daily_report(state):
-    """Wieczorny raport dnia na Telegram (po 22:00 PL, raz dziennie): dzisiejsze
-    sygnaly z wynikami, bilans R (dzis / 7 dni / od startu) i efekt filtra TV.
-    Zwraca True gdy zmienil stan (dedup po dacie)."""
+    """Raport dnia na Telegram, raz na dzien. Zwraca True gdy zmienil stan.
+
+    Okno 22:00-24:00 PL okazalo sie zawodne: 29.07 bot mial w nim skany, ale
+    rownolegle biegi bily sie o repo ("push nieudany"), stan sie nie zapisal
+    i raport poszedl dwa razy, a klucz w state.json nie przetrwal. Dlatego:
+    - raportujemy DZIEN ZAMKNIETY: po 22:00 dzisiejszy, wczesniej wczorajszy;
+    - odhaczamy date PRZED wysylka, wiec nawet gdy stan zginie, kolejny bieg
+      wysle najwyzej jeden duplikat, a nie serie;
+    - jesli bot przespi caly wieczor, raport i tak dojdzie nastepnego dnia.
+    """
     now = dt.datetime.now(TZ_PL)
-    today = now.date().isoformat()
-    if now.hour < 22 or state.get("daily_report") == today:
+    cel = now.date() if now.hour >= 22 else now.date() - dt.timedelta(days=1)
+    cel_s = cel.isoformat()
+    if state.get("daily_report") == cel_s:
         return False
-    state["daily_report"] = today
+    state["daily_report"] = cel_s
     wyniki = load_json(WYNIKI_FILE, {})
     cien = load_json(TVGATE_WYNIKI, {})
-    dzis = {k: v for k, v in wyniki.items() if str(_dzien_pl(k)) == today}
-    cien_dzis = {k: v for k, v in cien.items() if str(_dzien_pl(k)) == today}
+    dzis = {k: v for k, v in wyniki.items() if str(_dzien_pl(k)) == cel_s}
+    cien_dzis = {k: v for k, v in cien.items() if str(_dzien_pl(k)) == cel_s}
     if not dzis and not cien_dzis:
+        print(f"raport dnia ({cel_s}): brak sygnalow, nie wysylam")
         return True   # cichy dzien - nie spamujemy, ale date odhaczamy
 
     def suma(d, dni=None):
-        gr = now.date() - dt.timedelta(days=dni) if dni else None
+        gr = cel - dt.timedelta(days=dni) if dni else None
         return sum(v.get("r", 0) for k, v in d.items()
                    if v.get("status") not in ("otwarty", "brak_danych")
                    and (gr is None or (_dzien_pl(k) or gr) >= gr))
 
-    linie = [f"\U0001F4CA RAPORT DNIA ({now.strftime('%d.%m')})",
-             f"Sygnaly wyslane dzis: {len(dzis)}"]
+    linie = [f"\U0001F4CA RAPORT DNIA ({cel.strftime('%d.%m')})",
+             f"Sygnaly wyslane tego dnia: {len(dzis)}"]
     for k in sorted(dzis):
         v = dzis[k]
         e = STATUS_EMOJI.get(v["status"], "⏳")
         godz = dt.datetime.fromisoformat(k).astimezone(TZ_PL).strftime("%H:%M")
         wyn = v["status"] if v["status"] != "otwarty" else "otwarty"
         linie.append(f"{e} {godz} {v['instrument']} {v['strona']} -> {wyn} ({v.get('r', 0):+.1f}R)")
-    linie.append(f"Bilans R: dzis {suma(dzis):+.1f} | 7 dni {suma(wyniki, 7):+.1f} "
+    linie.append(f"Bilans R: ten dzien {suma(dzis):+.1f} | 7 dni {suma(wyniki, 7):+.1f} "
                  f"| od startu {suma(wyniki):+.1f}")
     if cien:
-        linie.append(f"\U0001F6E1 Filtr TV: dzis zatrzymal {len(cien_dzis)}, "
-                     f"lacznie {len(cien)} (wynik cienia: {suma(cien):+.1f}R - "
-                     "im bardziej ujemny, tym wiecej strat unikniete)")
+        s_cien = suma(cien)
+        ocena = ("filtr oszczedzil straty" if s_cien < 0 else
+                 "filtr kosztowal zysk" if s_cien > 0 else "bez roznicy")
+        linie.append(f"\U0001F6E1 Filtr TV: tego dnia zatrzymal {len(cien_dzis)}, "
+                     f"lacznie {len(cien)} (wynik wstrzymanych: {s_cien:+.1f}R - {ocena})")
     send_telegram("\n".join(linie) + stopka())
     return True
 
