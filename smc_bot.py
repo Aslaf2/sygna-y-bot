@@ -28,9 +28,21 @@ SYMBOLS = [
     ("XAUUSD (zloto)",  "GC=F",     ["USD"]),
     ("XAGUSD (srebro)", "SI=F",     ["USD"]),
     ("BRENT (ropa)",    "BZ=F",     ["USD"]),
+    ("HK50 (Hang Seng)", "^HSI",    ["USD"]),
     ("EURUSD",          "EURUSD=X", ["USD", "EUR"]),
     ("US100 (Nasdaq)",  "^NDX",     ["USD"]),
 ]
+# HANG SENG dodany 30.07.2026 (eksperyment9.py - przeglad 15 rynkow juz z
+# killzone azjatycka): n=49, +0.61R/sygnal, win 43%, obie polowki dodatnie
+# (+0.90/+0.34), lacznie +29.9R/60dni. Sygnaly powstaja w godzinach 3-4 NY,
+# czyli na popoludniowej sesji w Hongkongu. Prawdziwa dywersyfikacja:
+# korelacja dzienna z Brentem -0.01, ze zlotem 0.27, ze srebrem 0.29.
+# TradingView GO OBSLUGUJE (TVC:HSI, cena zgodna z Yahoo), wiec ma filtr TV.
+# NAJSLABSZY z dodanych rynkow: najmniejsza probka (n=49) i 68% wyniku pochodzi
+# z 3 najlepszych dni (Brent 46%, zloto 75%) - jesli cos ma wypasc, to on.
+# WTI (CL=F) ODRZUCONY mimo +0.39R: 72% jego sygnalow to ta sama godzina i
+# kierunek co Brent. Odrzucone ujemne: Nikkei, miedz, NZDUSD, BTC, AUDUSD,
+# GBPUSD, AUDJPY, USDJPY, EURJPY (najgorszy: -0.72R/sygnal).
 # BRENT dodany 29.07.2026 po przegladzie 17 rynkow tym samym silnikiem
 # (uniwersum.py, 60 dni, rozliczenie 3R ze spreadem). Brent: n=93, +0.56R/sygnal,
 # win 40%, obie polowki probki dodatnie (+0.79/+0.33), 22 zyskowne dni na 42,
@@ -81,6 +93,9 @@ TV_TA_MAP = {
     "SI=F":     ("SILVER", "TVC",    "cfd"),
     "EURUSD=X": ("EURUSD", "FX_IDC", "forex"),
     "^NDX":     ("NDX",    "NASDAQ", "america"),
+    "^HSI":     ("HSI",    "TVC",    "cfd"),
+    # BZ=F (Brent) celowo bez wpisu - darmowe API TradingView nie ma ropy
+    # pod zadna ze sprawdzonych nazw, wiec dziala bez filtra TV (fail-open).
 }
 
 INTERVAL  = os.getenv("TF", "5m")
