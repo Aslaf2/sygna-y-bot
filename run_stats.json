@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-07-30T13:55:44.441384+00:00",
- "czas_pl": "30.07.2026 15:55",
+ "czas_utc": "2026-07-30T14:00:56.293706+00:00",
+ "czas_pl": "30.07.2026 16:00",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "scan",
@@ -8,15 +8,15 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2323
+   "bars": 2324
   },
   "XAGUSD (srebro)": {
-   "etap": "detect",
-   "kandydaci": 1,
+   "etap": "scan",
+   "kandydaci": 0,
    "zatwierdzone": 0,
    "wyslane": false,
-   "opis": "kandydaci odrzuceni przez walidator",
-   "bars": 2322
+   "opis": "brak setupu na ostatnich swiecach",
+   "bars": 2323
   },
   "BRENT (ropa)": {
    "etap": "scan",
@@ -32,7 +32,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2736
+   "bars": 2737
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -40,16 +40,10 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.23R/sygnal 30d, -7.3R live)",
-   "bars": 708
+   "bars": 709
   }
  },
  "historia": [
-  {
-   "t": "2026-07-29T15:15:22.809417+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-07-29T15:20:29.768434+00:00",
    "k": 0,
@@ -1241,6 +1235,12 @@
   {
    "t": "2026-07-30T13:55:44.441384+00:00",
    "k": 1,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-07-30T14:00:56.293706+00:00",
+   "k": 0,
    "z": 0,
    "w": 0
   }
