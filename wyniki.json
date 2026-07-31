@@ -1137,10 +1137,10 @@
   "instrument": "BRENT (ropa)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-07-30T19:32:03.284346+00:00"
+  "rozliczono_utc": "2026-07-31T11:30:10.053603+00:00"
  },
  "2026-07-31T01:13:52.934423+00:00": {
   "instrument": "BRENT (ropa)",
@@ -1155,10 +1155,10 @@
   "instrument": "BRENT (ropa)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-07-31T01:34:34.455739+00:00"
+  "rozliczono_utc": "2026-07-31T11:30:10.698157+00:00"
  },
  "2026-07-31T07:20:58.335245+00:00": {
   "instrument": "XAGUSD (srebro)",
@@ -1209,10 +1209,10 @@
   "instrument": "BRENT (ropa)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-07-31T08:28:49.710074+00:00"
+  "rozliczono_utc": "2026-07-31T11:30:11.417238+00:00"
  },
  "2026-07-31T08:39:08.701534+00:00": {
   "instrument": "HK50 (Hang Seng)",
