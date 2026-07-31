@@ -57,10 +57,15 @@ jobs:
             echo "--- skan $(date -u +%H:%M:%S) UTC (petla do +${MIN}min) ---"
             python smc_bot.py
             python sesje_bot.py || echo "sesje_bot: blad (nie przerywa petli)"
+            # Zloty Mentor - osobny projekt (tylko zloto, radar 30 min przed
+            # oknem + wykres na Telegram). Wlasny stan i wlasny log, wiec nie
+            # miesza sie z SMC. Blad NIE przerywa petli glownego bota.
+            python zloty-mentor/mentor.py || echo "mentor: blad (nie przerywa petli)"
             # zapisz stan tylko gdy sie zmienil (dedup przetrwa nawet gdy job sie urwie)
             git add state.json sygnaly_log.csv run_stats.json wyniki.json
             git add sygnaly_odrzucone_tv.csv wyniki_odrzucone_tv.json 2>/dev/null || true
             git add sesje_log.csv 2>/dev/null || true
+            git add zloty-mentor/stan_mentor.json zloty-mentor/sygnaly_mentor.csv 2>/dev/null || true
             if ! git diff --cached --quiet; then
               git commit -m "update state + log sygnalow" && git push || echo "push nieudany"
             fi
