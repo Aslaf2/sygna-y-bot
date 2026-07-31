@@ -41,7 +41,9 @@
     "USD|Unemployment Claims|2026-07-30T08:30:00-04:00",
     "EUR|Core CPI Flash Estimate y/y|2026-07-31T05:00:00-04:00",
     "EUR|CPI Flash Estimate y/y|2026-07-31T05:00:00-04:00",
-    "USD|Employment Cost Index q/q|2026-07-31T08:30:00-04:00"
+    "USD|Employment Cost Index q/q|2026-07-31T08:30:00-04:00",
+    "USD|Revised UoM Consumer Sentiment|2026-07-31T10:00:00-04:00",
+    "USD|Revised UoM Inflation Expectations|2026-07-31T10:00:00-04:00"
   ],
   "daily_summary": "2026-07-31",
   "sent_bars": {
@@ -206,6 +208,6 @@
     "^HSI": "2026-07-31T08:39:03.023915+00:00"
   },
   "data_alert": "2026-07-24T10:58:09.035369+00:00",
-  "sesje_last_bar": "2026-07-31T04:00:00+00:00",
+  "sesje_last_bar": "2026-07-31T08:00:00+00:00",
   "daily_report": "2026-07-30"
 }
