@@ -1213,5 +1213,14 @@
   "r": 0.0,
   "model": "3R",
   "rozliczono_utc": "2026-07-31T08:28:49.710074+00:00"
+ },
+ "2026-07-31T08:39:08.701534+00:00": {
+  "instrument": "HK50 (Hang Seng)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-07-31T08:39:11.061136+00:00"
  }
 }
