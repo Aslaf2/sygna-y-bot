@@ -515,8 +515,13 @@ def obsluz_radar(df, stan, teraz_ny):
         tekst = tekst_radaru(kierunek, cena, sh[-1] if sh else None,
                              sl_pts[-1] if sl_pts else None, start_pl, koniec_pl,
                              kz, MIN_RISK_ATR * a, tv)
-        tg_zdjecie(png, tekst)
+        # Znacznik zapisujemy PRZED wysylka i od razu na dysk. Gdyby proces
+        # padl albo zapis repo sie nie udal, gorzej jest wyslac radar drugi raz
+        # niz nie wyslac go wcale - starszy bot mial dokladnie ten blad przy
+        # raporcie dnia i wiadomosci szly podwojnie.
         stan.setdefault("radary", {})[klucz] = teraz_pl().isoformat()
+        zapisz_stan(stan)
+        tg_zdjecie(png, tekst)
         return True
     return False
 
@@ -563,6 +568,13 @@ def obsluz_sygnal(df, stan, teraz_ny):
             return True
     delta = spot_korekta(df, tv)
     licznik["n"] += 1
+    # jak przy radarze: swieca jest odhaczana i zapisywana ZANIM cokolwiek
+    # poleci na Telegram, zeby przerwany bieg nie wyslal sygnalu dwa razy
+    stan.setdefault("wyslane_swiece", []).append(klucz)
+    stan["wyslane_swiece"] = stan["wyslane_swiece"][-200:]
+    stan["ostatni_sygnal"] = dt.datetime.now(dt.timezone.utc).isoformat()
+    stan["licznik"] = licznik
+    zapisz_stan(stan)
     png = W.sygnal_png(zamkniete, NAZWA, setup["strona"],
                        setup["wejscie"] + (delta or 0), setup["sl"] + (delta or 0),
                        setup["tp"] + (delta or 0), setup["swieca"],
@@ -571,10 +583,6 @@ def obsluz_sygnal(df, stan, teraz_ny):
                        TZ_PL)
     tg_zdjecie(png, tekst_sygnalu(setup, tv, delta, licznik["n"]))
     zapisz_log(setup, tv)
-    stan.setdefault("wyslane_swiece", []).append(klucz)
-    stan["wyslane_swiece"] = stan["wyslane_swiece"][-200:]
-    stan["ostatni_sygnal"] = dt.datetime.now(dt.timezone.utc).isoformat()
-    stan["licznik"] = licznik
     stan.setdefault("otwarte", []).append({
         "czas": dt.datetime.now(dt.timezone.utc).isoformat(),
         "strona": setup["strona"], "wejscie": setup["wejscie"],
