@@ -1177,5 +1177,32 @@
   "r": 0.0,
   "model": "3R",
   "rozliczono_utc": "2026-07-31T07:31:21.760783+00:00"
+ },
+ "2026-07-31T08:18:20.791666+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-07-31T08:18:27.915470+00:00"
+ },
+ "2026-07-31T08:18:22.564758+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-07-31T08:18:27.915981+00:00"
+ },
+ "2026-07-31T08:18:25.556829+00:00": {
+  "instrument": "HK50 (Hang Seng)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-07-31T08:18:27.916518+00:00"
  }
 }
