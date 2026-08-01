@@ -411,6 +411,10 @@ def tekst_radaru(kierunek, cena, sw_hi, sw_lo, start, koniec, kz_h, min_ryz, tv)
         "",
         "\U0001F4CC Uczciwie: setup pojawia sie mniej wiecej w co drugim oknie.",
         "Jesli sie nie pojawi - nie wchodzimy. Brak sygnalu to tez decyzja.",
+        "",
+        f"\U0001F514 Tak czy inaczej odezwe sie do {koniec.strftime('%H:%M')}: "
+        f"albo z sygnalem wejscia, albo z informacja, ze okazji nie bylo.",
+        "Nie zostawie Cie z samym tym radarem.",
     ]
     if tv:
         linie.append(f"\n\U0001F4CA TradingView teraz: {tv['opis']}")
@@ -526,6 +530,57 @@ def obsluz_radar(df, stan, teraz_ny):
     return False
 
 
+def obsluz_zamkniecie_okna(stan, teraz_ny):
+    """Domyka okno slowem, gdy nie bylo setupu.
+
+    Bez tego uzytkownik dostawal radar ("za 30 min otwiera sie okno") i potem
+    CISZE - nie wiedzac, czy bot padl, czy po prostu nie bylo okazji. Cisza
+    jest poprawna decyzja, ale musi byc powiedziana na glos.
+    Podsumowanie idzie tylko dla okien, o ktorych wczesniej uprzedzil radar.
+    """
+    for kz in KILLZONE:
+        koniec = teraz_ny.replace(hour=(kz + 1) % 24, minute=0, second=0, microsecond=0)
+        po_zamknieciu = (teraz_ny - koniec).total_seconds() / 60
+        if not (0 <= po_zamknieciu <= 12):
+            continue
+        klucz = f"{teraz_ny.date()}|{kz}"
+        if not stan.get("radary", {}).get(klucz):
+            return False                      # nie uprzedzalismy - nie podsumowujemy
+        if stan.get("podsumowania", {}).get(klucz):
+            return False
+        stan.setdefault("podsumowania", {})[klucz] = teraz_pl().isoformat()
+        if stan.get("sygnaly_okien", {}).get(klucz):
+            zapisz_stan(stan)
+            return True                       # sygnal byl - nie ma czego domykac
+        zapisz_stan(stan)
+        nast = nastepne_okno(teraz_ny)
+        tg_tekst(
+            f"\U0001F634 Okno zamkniete - bez wejscia\n"
+            f"{NAZWA} · {NAZWY_OKIEN.get(kz, 'okno')}\n\n"
+            f"Warunki sie nie zeszly, wiec NIE wchodzimy. To normalne - setup "
+            f"pojawia sie mniej wiecej w co drugim oknie, a czekanie na wlasciwy "
+            f"moment jest czescia strategii.\n\n"
+            f"Nastepne okno: {nast}" + stopka())
+        return True
+    return False
+
+
+def nastepne_okno(teraz_ny):
+    """Kiedy (czasu polskiego) otwiera sie najblizsze okno handlowe."""
+    kand = []
+    for kz in KILLZONE:
+        s = teraz_ny.replace(hour=kz, minute=0, second=0, microsecond=0)
+        if s <= teraz_ny:
+            s += dt.timedelta(days=1)
+        kand.append(s)
+    s = min(kand)
+    pl = s.astimezone(TZ_PL)
+    # dzien odniesienia bierzemy z PRZEKAZANEGO czasu, nie z zegara systemowego -
+    # inaczej przy nocnych oknach (i w testach) wychodzi "jutro" zamiast "dzis"
+    kiedy = "dzis" if pl.date() == teraz_ny.astimezone(TZ_PL).date() else "jutro"
+    return f"{kiedy} o {pl.strftime('%H:%M')} (radar {RADAR_MIN} min wczesniej)"
+
+
 def obsluz_sygnal(df, stan, teraz_ny):
     dzis = teraz_pl().date().isoformat()
     licznik = stan.get("licznik", {})
@@ -574,6 +629,11 @@ def obsluz_sygnal(df, stan, teraz_ny):
     stan["wyslane_swiece"] = stan["wyslane_swiece"][-200:]
     stan["ostatni_sygnal"] = dt.datetime.now(dt.timezone.utc).isoformat()
     stan["licznik"] = licznik
+    # zaznacz, ze TO okno dostalo juz sygnal - inaczej podsumowanie napisaloby
+    # potem "bez wejscia", mimo ze sygnal poszedl
+    kz_teraz = [h for h in KILLZONE if h <= teraz_ny.hour < h + 1]
+    if kz_teraz:
+        stan.setdefault("sygnaly_okien", {})[f"{teraz_ny.date()}|{kz_teraz[0]}"] = True
     zapisz_stan(stan)
     png = W.sygnal_png(zamkniete, NAZWA, setup["strona"],
                        setup["wejscie"] + (delta or 0), setup["sl"] + (delta or 0),
@@ -656,6 +716,7 @@ def main():
     if w_killzone(teraz_ny):
         zmiana |= bool(obsluz_sygnal(df, stan, teraz_ny))
     else:
+        zmiana |= bool(obsluz_zamkniecie_okna(stan, teraz_ny))
         print("poza oknem handlowym - tylko obserwuje")
     zmiana |= bool(rozlicz(df, stan))
     if zmiana:
