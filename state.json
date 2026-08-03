@@ -43,7 +43,9 @@
     "EUR|CPI Flash Estimate y/y|2026-07-31T05:00:00-04:00",
     "USD|Employment Cost Index q/q|2026-07-31T08:30:00-04:00",
     "USD|Revised UoM Consumer Sentiment|2026-07-31T10:00:00-04:00",
-    "USD|Revised UoM Inflation Expectations|2026-07-31T10:00:00-04:00"
+    "USD|Revised UoM Inflation Expectations|2026-07-31T10:00:00-04:00",
+    "USD|ISM Manufacturing PMI|2026-08-03T10:00:00-04:00",
+    "USD|ISM Manufacturing Prices|2026-08-03T10:00:00-04:00"
   ],
   "daily_summary": "2026-08-03",
   "sent_bars": {
