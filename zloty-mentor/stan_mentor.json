@@ -25,15 +25,6 @@
  "sygnaly_okien": {
   "2026-08-03|14": true
  },
- "otwarte": [
-  {
-   "czas": "2026-08-03T18:06:31.302800+00:00",
-   "strona": "SHORT",
-   "wejscie": 4086.5,
-   "sl": 4095.982195172991,
-   "tp": 4058.053414481027,
-   "strategia": "Silver Bullet",
-   "swieca": "2026-08-03T13:50:00-04:00"
-  }
- ]
+ "otwarte": [],
+ "bilans": -1.0
 }
