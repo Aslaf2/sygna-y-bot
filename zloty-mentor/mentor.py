@@ -60,6 +60,16 @@ IMPET_OKNO   = 12                   # ile swiec wstecz liczy sie zakres
 MAX_DZIENNIE = 3                    # twardy limit sygnalow na dzien
 COOLDOWN_MIN = 25                   # pauza po wyslanym sygnale
 
+# TRYB OBSERWACJI - wlaczony 04.08.2026, bo dane przestaly potwierdzac przewage.
+# Backtest silnika na NAJNOWSZYCH danych zlota (eksperyment16.py) rozbity na
+# tygodnie: 08.06-06.07 = +42R przy 25-62% trafien, potem piec tygodni z rzedu
+# -1/-5/+2/-4/-1R. Ostatnie 14 dni: 21% trafien i -2R, przy progu oplacalnosci
+# 25% dla celu 3R. Live zgadza sie z backtestem (23%), wiec to NIE jest usterka
+# wykonania - przewaga po prostu znikla. Sygnaly nadal powstaja i sa rozliczane
+# na papierze, ale ida oznaczone jako nauka. Bot sam zglosi powrot przewagi.
+TRYB_OBSERWACJI = True
+PROG_POWROTU_N  = 20      # tyle rozliczonych sygnalow musi sie uzbierac do oceny
+
 # Sciezki liczone od pliku, nie od katalogu uruchomienia - w GitHub Actions
 # bot startuje z katalogu glownego repozytorium, a stan ma lezec przy nim.
 KATALOG    = os.path.dirname(os.path.abspath(__file__))
@@ -419,7 +429,11 @@ def tekst_radaru(kierunek, cena, sw_hi, sw_lo, start, koniec, kz_h, min_ryz, tv)
     if tv:
         linie.append(f"\n\U0001F4CA TradingView teraz: {tv['opis']}")
     linie.append(f"\n\U0001F517 Wykres: {link_tv()}")
-    return "\n".join(linie) + stopka()
+    tekst = "\n".join(linie) + stopka()
+    if TRYB_OBSERWACJI:
+        return ("\U0001F4D8 TRYB NAUKI - to obserwacja, nie zaproszenie do handlu\n"
+                "─────────────────\n" + tekst)
+    return tekst
 
 
 def tekst_sygnalu(s, tv, spot_delta, nr_dnia):
@@ -456,10 +470,57 @@ def tekst_sygnalu(s, tv, spot_delta, nr_dnia):
     if tv:
         linie.append(f"\U0001F4CA TradingView 5m: {tv['opis']}")
     linie.append(f"\U0001F517 {link_tv()}")
-    return "\n".join(linie) + stopka()
+    tekst = "\n".join(linie) + stopka()
+    return (NAGLOWEK_NAUKA + tekst) if TRYB_OBSERWACJI else tekst
 
 
 # ------------------------------------------------------------------- logika
+
+NAGLOWEK_NAUKA = (
+    "\U0001F4D8 TRYB NAUKI - NIE GRAJ TEGO\n"
+    "Dane nie potwierdzaja obecnie przewagi (21% trafien przy progu 25%),\n"
+    "wiec sygnaly ida na papier. Obserwuj i ucz sie, nie ryzykuj pieniedzy.\n"
+    "─────────────────\n")
+
+
+def ocena_przewagi(stan):
+    """Czy ostatnie sygnaly wrocily nad prog oplacalnosci.
+
+    Zwraca (ile_policzono, suma_R, werdykt). Werdykt None = za malo danych.
+    Prog jest celowo ostrzejszy niz samo wyjscie na zero: wymagam DODATNIEJ
+    sumy R na pelnym oknie, zeby pojedyncza szczesliwa seria nie wlaczyla
+    z powrotem handlu.
+    """
+    h = stan.get("historia_r", [])
+    ost = h[-PROG_POWROTU_N:]
+    suma = sum(ost)
+    if len(ost) < PROG_POWROTU_N:
+        return len(ost), suma, None
+    return len(ost), suma, suma > 0
+
+
+def sprawdz_powrot_przewagi(stan):
+    """Gdy papierowe wyniki wroca nad kreske - powiedz o tym, ale nie wlaczaj
+    handlu samoczynnie. Decyzja o graniu realnymi pieniedzmi nalezy do czlowieka."""
+    if not TRYB_OBSERWACJI:
+        return False
+    n, suma, werdykt = ocena_przewagi(stan)
+    if not werdykt:
+        return False
+    if stan.get("zgloszony_powrot"):
+        return False
+    stan["zgloszony_powrot"] = teraz_pl().isoformat()
+    zapisz_stan(stan)
+    wygrane = sum(1 for r in stan.get("historia_r", [])[-PROG_POWROTU_N:] if r > 0)
+    tg_tekst(
+        f"\U0001F4C8 PRZEWAGA WROCILA (na papierze)\n\n"
+        f"Ostatnie {n} sygnalow w trybie nauki: {suma:+.0f}R, "
+        f"trafnosc {100*wygrane/n:.0f}% (prog to 25%).\n\n"
+        f"To pierwszy od dawna sygnal, ze strategia znowu dziala. NIE wlaczam "
+        f"handlu sam - to Twoja decyzja. Odezwij sie, sprawdze wtedy dane "
+        f"jeszcze raz i razem zdecydujemy." + stopka())
+    return True
+
 
 def zapisz_log(s, tv):
     import csv
@@ -679,15 +740,23 @@ def rozlicz(df, stan):
                 continue
             nazwa, r = status
             stan["bilans"] = round(stan.get("bilans", 0.0) + r, 2)
+            # historia wynikow = podstawa oceny, czy przewaga wrocila
+            stan.setdefault("historia_r", []).append(r)
+            stan["historia_r"] = stan["historia_r"][-100:]
             ikona = "\U0001F48E" if r > 0 else "\U0001F534"
             nauka = ("Cel osiagniety. Tak wygladaja te 40% przypadkow, "
                      "ktore pokrywaja straty z pozostalych."
                      if r > 0 else
                      "Stop zadzialal - i dobrze. Jedna strata to -1R; "
                      "jeden trafiony cel oddaje trzy takie straty.")
+            n_ost, suma_ost, _ = ocena_przewagi(stan)
+            papier = " (na papierze)" if TRYB_OBSERWACJI else ""
             tg_tekst(f"{ikona} {nazwa}: {poz['strona']} {poz['strategia']} "
-                     f"({r:+.0f}R)\n{nauka}\n"
-                     f"Bilans od startu: {stan['bilans']:+.1f}R" + stopka())
+                     f"({r:+.0f}R){papier}\n{nauka}\n"
+                     f"Bilans od startu: {stan['bilans']:+.1f}R\n"
+                     f"Ostatnie {n_ost} sygnalow: {suma_ost:+.0f}R "
+                     f"(przewaga wraca przy wyniku dodatnim z {PROG_POWROTU_N})"
+                     + stopka())
             zmiana = True
         except Exception as e:
             print("rozliczenie blad:", e)
@@ -719,6 +788,7 @@ def main():
         zmiana |= bool(obsluz_zamkniecie_okna(stan, teraz_ny))
         print("poza oknem handlowym - tylko obserwuje")
     zmiana |= bool(rozlicz(df, stan))
+    zmiana |= bool(sprawdz_powrot_przewagi(stan))
     if zmiana:
         zapisz_stan(stan)
 

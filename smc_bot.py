@@ -73,7 +73,16 @@ MIN_SCORE = {"EURUSD=X": 4}
 # Sygnaly WYLACZONE per instrument (dane nadal pobierane - potrzebne do SETTLE).
 # Dowod (14.07, backtest 30d modelem R + 81 sygnalow live): US100 traci w obu
 # zbiorach (-0.23R/sygnal na n=45 backtest; -7.3R live) - wylaczony.
-NO_SIGNAL_SYMS = {"^NDX"}
+NO_SIGNAL_SYMS = {"^NDX", "EURUSD=X", "BZ=F"}
+# 04.08.2026 doszly EURUSD i BRENT (decyzja usera po przegladzie wynikow live
+# z wyniki.json, 145 rozliczonych sygnalow):
+#   EURUSD  n=15  -11.0R  -0.73R/sygnal  trafnosc 7%  <- najgorszy z calego zestawu
+#   BRENT   n= 8   -4.0R  -0.50R/sygnal  trafnosc 12%
+# UWAGA co do Brenta: jego probka live jest MALA (n=8), a backtest 60d dawal
+# +0.56R/sygnal przy n=93 - to moze byc zwykly pech, nie brak przewagi. Wylaczony
+# swiadomie, bo caly zestaw jest w tym okresie pod kreska (-9R od poczatku,
+# 23% trafien przy progu 25%), a user chcial ograniczyc straty i halas.
+# Gdyby wracac: najpierw Brent, i dopiero po sprawdzeniu swiezego backtestu.
 
 # Godziny NY, w ktorych NIE szukamy setupow. Dowod (14.07): killzone NY AM
 # (10-11) ma ~0R na backtescie 30d i -20.4R na 81 sygnalach live; wyciecie
