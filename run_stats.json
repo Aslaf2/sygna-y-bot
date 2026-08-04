@@ -1,22 +1,22 @@
 {
- "czas_utc": "2026-08-04T01:11:44.504999+00:00",
- "czas_pl": "04.08.2026 03:11",
+ "czas_utc": "2026-08-04T01:16:55.076602+00:00",
+ "czas_pl": "04.08.2026 03:16",
  "instrumenty": {
   "XAUUSD (zloto)": {
-   "etap": "scan",
-   "kandydaci": 0,
-   "zatwierdzone": 0,
-   "wyslane": false,
-   "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2165
+   "etap": "fill",
+   "kandydaci": 1,
+   "zatwierdzone": 1,
+   "wyslane": true,
+   "opis": "WYSLANO SHORT (Silver Bullet, 3 pkt)",
+   "bars": 2166
   },
   "XAGUSD (srebro)": {
-   "etap": "scan",
-   "kandydaci": 0,
+   "etap": "detect",
+   "kandydaci": 1,
    "zatwierdzone": 0,
    "wyslane": false,
-   "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2165
+   "opis": "kandydaci odrzuceni przez walidator",
+   "bars": 2166
   },
   "BRENT (ropa)": {
    "etap": "scan",
@@ -24,7 +24,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 1583
+   "bars": 1584
   },
   "HK50 (Hang Seng)": {
    "etap": "scan",
@@ -35,12 +35,12 @@
    "bars": 700
   },
   "EURUSD": {
-   "etap": "detect",
-   "kandydaci": 1,
+   "etap": "scan",
+   "kandydaci": 0,
    "zatwierdzone": 0,
    "wyslane": false,
-   "opis": "kandydaci odrzuceni przez walidator",
-   "bars": 2570
+   "opis": "brak setupu na ostatnich swiecach",
+   "bars": 2571
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -52,12 +52,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-08-03T05:21:11.176198+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-08-03T05:21:47.557884+00:00",
    "k": 0,
@@ -1251,6 +1245,12 @@
    "k": 1,
    "z": 0,
    "w": 0
+  },
+  {
+   "t": "2026-08-04T01:16:55.076602+00:00",
+   "k": 2,
+   "z": 1,
+   "w": 1
   }
  ]
 }
