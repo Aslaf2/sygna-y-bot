@@ -73,16 +73,23 @@ MIN_SCORE = {"EURUSD=X": 4}
 # Sygnaly WYLACZONE per instrument (dane nadal pobierane - potrzebne do SETTLE).
 # Dowod (14.07, backtest 30d modelem R + 81 sygnalow live): US100 traci w obu
 # zbiorach (-0.23R/sygnal na n=45 backtest; -7.3R live) - wylaczony.
-NO_SIGNAL_SYMS = {"^NDX", "EURUSD=X", "BZ=F"}
+NO_SIGNAL_SYMS = {"^NDX", "EURUSD=X"}
 # 04.08.2026 doszly EURUSD i BRENT (decyzja usera po przegladzie wynikow live
 # z wyniki.json, 145 rozliczonych sygnalow):
 #   EURUSD  n=15  -11.0R  -0.73R/sygnal  trafnosc 7%  <- najgorszy z calego zestawu
 #   BRENT   n= 8   -4.0R  -0.50R/sygnal  trafnosc 12%
-# UWAGA co do Brenta: jego probka live jest MALA (n=8), a backtest 60d dawal
-# +0.56R/sygnal przy n=93 - to moze byc zwykly pech, nie brak przewagi. Wylaczony
-# swiadomie, bo caly zestaw jest w tym okresie pod kreska (-9R od poczatku,
-# 23% trafien przy progu 25%), a user chcial ograniczyc straty i halas.
-# Gdyby wracac: najpierw Brent, i dopiero po sprawdzeniu swiezego backtestu.
+#
+# 05.08.2026 BRENT PRZYWROCONY (decyzja usera po swiezym tescie - dokladnie ten
+# warunek byl tu zapisany: "gdyby wracac: najpierw Brent, po swiezym backtescie").
+# Powod wylaczenia okazal sie pomylka atrybucji: z 7 stopow Brenta live az 4 padly
+# w sesji LONDYNSKIEJ, ktora 05.08 zostala wycieta z killzone jako wygasla.
+#   Brent live BEZ Londynu:  1 cel / 3 stopy = 0R (probka za mala na wniosek)
+#   Brent backtest BEZ Londynu (60d, 3R, ze spreadem):
+#       n=87  +0.55R/sygnal  win 40%  polowki +0.70/+0.41  ostatnie 30 dni +0.41
+#   To najlepszy wynik ze wszystkich rynkow, ktore zostaly.
+# Ta sama pomylka dotyczyla HK50 (handlowal wylacznie w Londynie) - dlatego przy
+# ocenie rynku ZAWSZE rozbijac wynik na sesje, zanim sie cokolwiek wylaczy.
+# EURUSD zostaje wylaczony: jego straty rozkladaja sie na wszystkie sesje.
 
 # Godziny NY, w ktorych NIE szukamy setupow. Dowod (14.07): killzone NY AM
 # (10-11) ma ~0R na backtescie 30d i -20.4R na 81 sygnalach live; wyciecie
