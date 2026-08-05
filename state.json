@@ -46,7 +46,8 @@
     "USD|Revised UoM Inflation Expectations|2026-07-31T10:00:00-04:00",
     "USD|ISM Manufacturing PMI|2026-08-03T10:00:00-04:00",
     "USD|ISM Manufacturing Prices|2026-08-03T10:00:00-04:00",
-    "USD|ADP Non-Farm Employment Change|2026-08-05T08:15:00-04:00"
+    "USD|ADP Non-Farm Employment Change|2026-08-05T08:15:00-04:00",
+    "USD|ISM Services PMI|2026-08-05T10:00:00-04:00"
   ],
   "daily_summary": "2026-08-05",
   "sent_bars": {
