@@ -378,7 +378,8 @@ NAZWY_OKIEN = {3: "sesja londynska", 14: "popoludnie w Nowym Jorku",
                20: "otwarcie Tokio"}
 
 
-def tekst_radaru(kierunek, cena, sw_hi, sw_lo, start, koniec, kz_h, min_ryz, tv):
+def tekst_radaru(kierunek, cena, sw_hi, sw_lo, start, koniec, kz_h, min_ryz, tv,
+                 spot_delta=0.0):
     strzalka = "\U0001F53A" if kierunek == "LONG" else "\U0001F53B"
     slowo = "WZROSTOWY" if kierunek == "LONG" else "SPADKOWY"
     czego = ("luki wzrostowej - trzech swiec, miedzy ktorymi zostanie pusta "
@@ -426,6 +427,9 @@ def tekst_radaru(kierunek, cena, sw_hi, sw_lo, start, koniec, kz_h, min_ryz, tv)
         f"albo z sygnalem wejscia, albo z informacja, ze okazji nie bylo.",
         "Nie zostawie Cie z samym tym radarem.",
     ]
+    if spot_delta:
+        linie.append(f"\n\U0001F4CD Ceny SPOT (jak u brokera); kontrakt futures "
+                     f"jest {-spot_delta:+,.2f} od spotu.")
     if tv:
         linie.append(f"\n\U0001F4CA TradingView teraz: {tv['opis']}")
     linie.append(f"\n\U0001F517 Wykres: {link_tv()}")
@@ -551,6 +555,24 @@ def spot_korekta(df, tv):
         return None
 
 
+def na_spot(df, delta):
+    """Przesuwa swiece z kontraktu futures na ceny spot.
+
+    Bez tego wykres klamal: swiece rysowane byly w cenach Yahoo (futures),
+    a linie wejscia/stopu/celu w cenach spot - przy roznicy ~50 USD linia
+    wejscia ladowala kilkadziesiat dolarow OBOK swiecy, ktora rzekomo dala
+    sygnal. Poziomy i swiece musza byc w tej samej skali, tej samej, ktora
+    uzytkownik widzi u brokera.
+    """
+    if not delta:
+        return df
+    d = df.copy()
+    for k in ("Open", "High", "Low", "Close"):
+        if k in d.columns:
+            d[k] = d[k] + delta
+    return d
+
+
 def obsluz_radar(df, stan, teraz_ny):
     """Wysyla radar, jesli do startu ktoregos okna zostalo okolo RADAR_MIN minut."""
     for kz in KILLZONE:
@@ -572,14 +594,20 @@ def obsluz_radar(df, stan, teraz_ny):
         sh, sl_pts = swingi(h[-150:], l[-150:])
         a = float(atr(df).iloc[-1])
         start_pl, koniec_pl = okno_pl(kz, teraz_ny)
-        cena = float(df["Close"].iloc[-1])
         tv = ocena_tv()
-        png = W.radar_png(df, NAZWA, kierunek, start_pl, koniec_pl,
-                          sh[-1] if sh else None, sl_pts[-1] if sl_pts else None,
-                          MIN_RISK_ATR * a, TZ_PL)
-        tekst = tekst_radaru(kierunek, cena, sh[-1] if sh else None,
-                             sl_pts[-1] if sl_pts else None, start_pl, koniec_pl,
-                             kz, MIN_RISK_ATR * a, tv)
+        # Radar musi mowic tymi samymi cenami co pozniejszy sygnal i co wykres
+        # brokera - czyli SPOT. Wczesniej pokazywal surowe futures z Yahoo i przy
+        # roznicy ~50 USD uzytkownik widzial w radarze zupelnie inne poziomy niz
+        # 30 minut pozniej w sygnale. Uwaga: MIN_RISK_ATR * a to ODLEGLOSC,
+        # a nie poziom, wiec korekty nie wymaga.
+        delta = spot_korekta(df, tv) or 0.0
+        cena = float(df["Close"].iloc[-1]) + delta
+        sw_hi = (sh[-1] + delta) if sh else None
+        sw_lo = (sl_pts[-1] + delta) if sl_pts else None
+        png = W.radar_png(na_spot(df, delta), NAZWA, kierunek, start_pl, koniec_pl,
+                          sw_hi, sw_lo, MIN_RISK_ATR * a, TZ_PL)
+        tekst = tekst_radaru(kierunek, cena, sw_hi, sw_lo, start_pl, koniec_pl,
+                             kz, MIN_RISK_ATR * a, tv, delta)
         # Znacznik zapisujemy PRZED wysylka i od razu na dysk. Gdyby proces
         # padl albo zapis repo sie nie udal, gorzej jest wyslac radar drugi raz
         # niz nie wyslac go wcale - starszy bot mial dokladnie ten blad przy
@@ -696,7 +724,9 @@ def obsluz_sygnal(df, stan, teraz_ny):
     if kz_teraz:
         stan.setdefault("sygnaly_okien", {})[f"{teraz_ny.date()}|{kz_teraz[0]}"] = True
     zapisz_stan(stan)
-    png = W.sygnal_png(zamkniete, NAZWA, setup["strona"],
+    # swiece MUSZA byc w tej samej skali co poziomy (patrz na_spot) - inaczej
+    # linia wejscia lezy kilkadziesiat dolarow obok swiecy sygnalowej
+    png = W.sygnal_png(na_spot(zamkniete, delta or 0), NAZWA, setup["strona"],
                        setup["wejscie"] + (delta or 0), setup["sl"] + (delta or 0),
                        setup["tp"] + (delta or 0), setup["swieca"],
                        setup["strategia"],
