@@ -1483,5 +1483,14 @@
   "r": 0.0,
   "model": "3R",
   "rozliczono_utc": "2026-08-05T18:43:04.128692+00:00"
+ },
+ "2026-08-05T19:03:48.736575+00:00": {
+  "instrument": "BRENT (ropa)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-08-05T19:03:52.635328+00:00"
  }
 }
