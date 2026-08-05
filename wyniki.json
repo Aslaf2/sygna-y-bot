@@ -1398,10 +1398,10 @@
   "instrument": "XAGUSD (srebro)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "TP",
+  "r": 3.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-05T00:36:27.923903+00:00"
+  "rozliczono_utc": "2026-08-05T02:46:28.129007+00:00"
  },
  "2026-08-05T00:57:11.147051+00:00": {
   "instrument": "XAUUSD (zloto)",
