@@ -628,10 +628,24 @@ def in_killzone(now_ny):
     sa dodatnie (+0.30 i +0.28). Calosc: +97.0R -> +156.1R, czyli +61%.
     Godzin 19 i 21 NIE dodano: ich druga polowa probki jest plaska/ujemna.
     Okno 10-11 zostaje w liscie, ale SKIP_NY_HOURS i tak je wycina.
+
+    SESJA LONDYNSKA (3:00-4:00 NY) WYCIETA 05.08.2026 - przewaga wygasla.
+    Cztery niezalezne pomiary mowia to samo:
+      1) ostatnie 30 dni:        -0.27R/sygnal, -19.1R, win 20% (prog to 25%)
+      2) druga polowa probki 60d: -0.39R/sygnal (pierwsza byla +0.93)
+      3) live od 30.07:           3 trafienia na 19, -7R
+      4) wczesniejsze przeglady:  Londyn zawsze najslabszy (+0.11 vs +0.68 NY PM)
+    To NIE jest ogolne pogorszenie rynku: Azja w tym samym czasie ma polowki
+    +0.48/+0.52 (bez spadku), NY PM +0.72/+0.29. Zalamanie dotyczy Londynu.
+    Efekt na portfelu (60 dni): +170.0R -> +122.9R lacznie, ale +0.40 -> +0.50
+    na sygnal, a polowki z +0.65/+0.15 robia sie +0.59/+0.41 - czyli wynik
+    przestaje sie sypac w czasie, o co chodzi bardziej niz o sam sumaryczny R.
+    UWAGA: HK50 handlowal wylacznie w Londynie (dane Yahoo dla ^HSI koncza sie
+    o 4:00 NY), wiec po tej zmianie zamilknie. Zostaje w SYMBOLS, bo jego dane
+    sa potrzebne do rozliczania juz wyslanych sygnalow.
     """
     t = now_ny.hour * 60 + now_ny.minute
-    zones = [(3 * 60, 4 * 60), (10 * 60, 11 * 60),
-             (14 * 60, 15 * 60), (20 * 60, 21 * 60)]
+    zones = [(10 * 60, 11 * 60), (14 * 60, 15 * 60), (20 * 60, 21 * 60)]
     return any(a <= t <= b for a, b in zones)
 
 
