@@ -89,7 +89,10 @@ def _wczytaj_tajne():
     if TOKEN and CHAT_ID:
         return
     try:
-        with open(os.path.join(KATALOG, "tajne.json"), encoding="utf-8") as f:
+        # utf-8-sig, nie utf-8: Notatnik i PowerShell zapisuja plik ze znacznikiem
+        # BOM, na ktorym json.load() sie wywraca. Wyjatek jest tu polykany, wiec
+        # objawem byl "brak tokena" bez zadnego bledu - trudne do zdiagnozowania.
+        with open(os.path.join(KATALOG, "tajne.json"), encoding="utf-8-sig") as f:
             t = json.load(f)
         TOKEN = TOKEN or t.get("TG_TOKEN", "")
         CHAT_ID = CHAT_ID or str(t.get("TG_CHAT_ID", ""))
@@ -345,6 +348,107 @@ def znajdz_setup(df, ny):
 
 
 # ----------------------------------------------------------- TradingView
+
+def warunek_nastepnej(df, ny):
+    """Czy NASTEPNA swieca moze dac sygnal - i pod jakim warunkiem.
+
+    To wypelnia luke miedzy radarem (30 min przed oknem) a sygnalem (juz po
+    fakcie). Da sie to policzyc uczciwie, bo glowny warunek Silver Bulleta
+    jest znany z gory: luka wzrostowa powstanie, gdy DOLEK nastepnej swiecy
+    zostanie nad szczytem sprzed dwoch swiec. Ten szczyt juz znamy.
+    Reszte warunkow (trend 1h, minimalne ryzyko) tez sprawdzamy juz teraz;
+    nieznany zostaje tylko impet, bo zalezy od zamkniecia tej swiecy.
+
+    Zwraca slownik albo None. NIE zgaduje, czy swieca sie uda - podaje warunek.
+    """
+    if not w_killzone(ny) or len(df) < EMA_LEN + SWING_LEN + 12:
+        return None
+    d = df.copy()
+    d["EMA"] = d["Close"].ewm(span=EMA_LEN, adjust=False).mean()
+    d["ATR"] = atr(d)
+    h, l, c = d["High"].values, d["Low"].values, d["Close"].values
+    i = len(d) - 1
+    a = float(d["ATR"].iloc[i])
+    if not np.isfinite(a) or a <= 0:
+        return None
+    hdir = trend_1h(df)
+    if hdir == 0:
+        return None
+    cena = float(c[i])
+    trend5 = 1 if cena > float(d["EMA"].iloc[i]) else -1
+    if trend5 != hdir:
+        return None                      # 5m i 1h musza patrzec w te sama strone
+    strona = "LONG" if hdir == 1 else "SHORT"
+
+    # luka przy nastepnej swiecy (indeks i+1) powstanie wzgledem szczytu/dolka
+    # ze swiecy i-1 - obie te wartosci juz znamy
+    poziom = float(h[i - 1]) if strona == "LONG" else float(l[i - 1])
+    # zapowiadamy tylko, gdy luka jest juz otwarta: cena zdazyla odskoczyc
+    # od tego poziomu, wiec nastepnej swiecy wystarczy go NIE naruszyc
+    if strona == "LONG" and cena <= poziom:
+        return None
+    if strona == "SHORT" and cena >= poziom:
+        return None
+
+    sh, sl_pts = swingi(h, l)
+    baza = (sl_pts[-1] if sl_pts else float(l[i])) if strona == "LONG" \
+        else (sh[-1] if sh else float(h[i]))
+    stop = baza - a * SL_BUF if strona == "LONG" else baza + a * SL_BUF
+    ryzyko = abs(cena - stop)
+    if ryzyko < MIN_RISK_ATR * a:
+        return None                      # stop w szumie - tego i tak nie wyslemy
+    tp = cena + (RR_TP * ryzyko if strona == "LONG" else -RR_TP * ryzyko)
+    zamkniecie = d.index[i] + dt.timedelta(minutes=5)
+    return {"strona": strona, "poziom": poziom, "wejscie": cena, "sl": stop,
+            "tp": tp, "ryzyko": ryzyko, "atr": a, "ryzyko_atr": ryzyko / a,
+            "zamkniecie": zamkniecie, "swieca_i": d.index[i]}
+
+
+def tekst_czuwania(w, koniec_okna, tv, spot_delta=0.0):
+    off = spot_delta or 0.0
+    we, sl, tp = w["wejscie"] + off, w["sl"] + off, w["tp"] + off
+    poziom = w["poziom"] + off
+    zam = w["zamkniecie"].astimezone(TZ_PL)
+    ikona = "\U0001F7E2" if w["strona"] == "LONG" else "\U0001F534"
+    strona_slow = "wzrostowy (LONG)" if w["strona"] == "LONG" else "spadkowy (SHORT)"
+    czego = "nie zejdzie ponizej" if w["strona"] == "LONG" else "nie wyjdzie powyzej"
+    linie = [
+        f"\U000023F3 CZUWANIE - setup sie formuje",
+        "",
+        f"{ikona} Szykuje sie {strona_slow} na {NAZWA}",
+        f"Decyduje swieca, ktora zamknie sie o {zam.strftime('%H:%M')} "
+        f"(czas polski) - czyli za okolo 5 minut.",
+        "",
+        "WARUNEK WEJSCIA:",
+        f"· dolek/szczyt tej swiecy {czego} {poziom:,.2f}",
+        f"· swieca musi zamknac sie z impetem, przy "
+        f"{'gornej' if w['strona'] == 'LONG' else 'dolnej'} krawedzi zakresu",
+        "",
+        "JESLI SIE POTWIERDZI, WCHODZIMY TAK:",
+        f"· wejscie:  {we:,.2f}   (po cenie rynkowej, zaraz po zamknieciu)",
+        f"· stop:     {sl:,.2f}   (ryzyko {w['ryzyko']:,.2f} = {w['ryzyko_atr']:.1f}x ATR)",
+        f"· cel:      {tp:,.2f}   (+3R = {3*w['ryzyko']:,.2f})",
+        "",
+        "\U0001F4CC Poziomy sa ORIENTACYJNE - dokladne wyliczy sie na zamknieciu "
+        "swiecy i przysle je osobno.",
+        f"Jesli warunek nie zostanie spelniony, czekamy dalej; okno trwa do "
+        f"{koniec_okna.strftime('%H:%M')}.",
+    ]
+    if spot_delta:
+        linie.append(f"\n\U0001F4CD Ceny SPOT (jak u brokera); kontrakt futures "
+                     f"jest {-spot_delta:+,.2f} od spotu.")
+    if tv:
+        linie.append(f"\n\U0001F4CA TradingView teraz: {tv['opis']}")
+    linie.append(f"\n\U0001F517 Wykres: {link_tv()}")
+    tekst = "\n".join(linie) + stopka()
+    # UWAGA: sasiadujace literaly skleja sie PRZED mnozeniem, wiec zapis
+    # ("naglowek\n" "─") * 17 powiela caly naglowek 17 razy. Kreska osobno.
+    if TRYB_OBSERWACJI:
+        kreska = "─" * 17
+        return ("\U0001F4D8 TRYB NAUKI - to obserwacja, nie zaproszenie do handlu\n"
+                + kreska + "\n" + tekst)
+    return tekst
+
 
 def ocena_tv():
     try:
@@ -619,6 +723,45 @@ def obsluz_radar(df, stan, teraz_ny):
     return False
 
 
+def obsluz_czuwanie(df, stan, teraz_ny):
+    """Wysyla CZUWANIE - zapowiedz na jedna swiece przed ewentualnym wejsciem.
+
+    Bez tego uzytkownik dostawal radar 30 min wczesniej, a potem od razu gotowy
+    sygnal ("wchodzimy TERAZ") - bez chwili na przygotowanie. Czuwanie wypelnia
+    te luke: mowi, ktora swieca zdecyduje, jakiego poziomu musi sie trzymac
+    i jakie beda mniej wiecej poziomy wejscia.
+
+    Ograniczenia, zeby nie robic halasu:
+    - tylko w oknie handlowym i tylko gdy w tym oknie nie poszedl jeszcze sygnal,
+    - najwyzej RAZ na okno,
+    - znacznik zapisujemy PRZED wysylka (jak przy radarze).
+    """
+    kz = [h for h in KILLZONE if h <= teraz_ny.hour < h + 1]
+    if not kz:
+        return False
+    klucz = f"{teraz_ny.date()}|{kz[0]}"
+    if stan.get("czuwania", {}).get(klucz):
+        return False
+    if stan.get("sygnaly_okien", {}).get(klucz):
+        return False                      # sygnal juz byl, nie ma czego zapowiadac
+    w = warunek_nastepnej(df, teraz_ny)
+    if not w:
+        return False
+    tv = ocena_tv()
+    delta = spot_korekta(df, tv) or 0.0
+    _, koniec_pl = okno_pl(kz[0], teraz_ny)
+    png = W.czuwanie_png(na_spot(df, delta), NAZWA, w["strona"],
+                         w["poziom"] + delta, w["wejscie"] + delta,
+                         w["sl"] + delta, w["tp"] + delta,
+                         w["zamkniecie"], TZ_PL)
+    stan.setdefault("czuwania", {})[klucz] = teraz_pl().isoformat()
+    zapisz_stan(stan)
+    tg_zdjecie(png, tekst_czuwania(w, koniec_pl, tv, delta))
+    print(f"czuwanie: zapowiedziano mozliwy {w['strona']}, "
+          f"poziom {w['poziom'] + delta:,.2f}")
+    return True
+
+
 def obsluz_zamkniecie_okna(stan, teraz_ny):
     """Domyka okno slowem, gdy nie bylo setupu.
 
@@ -813,7 +956,12 @@ def main():
     zmiana = False
     zmiana |= bool(obsluz_radar(df, stan, teraz_ny))
     if w_killzone(teraz_ny):
-        zmiana |= bool(obsluz_sygnal(df, stan, teraz_ny))
+        wyslano = bool(obsluz_sygnal(df, stan, teraz_ny))
+        zmiana |= wyslano
+        # czuwanie tylko gdy sygnal wlasnie NIE poszedl - inaczej
+        # zapowiadalibysmy cos, co juz sie wydarzylo
+        if not wyslano:
+            zmiana |= bool(obsluz_czuwanie(df, stan, teraz_ny))
     else:
         zmiana |= bool(obsluz_zamkniecie_okna(stan, teraz_ny))
         print("poza oknem handlowym - tylko obserwuje")

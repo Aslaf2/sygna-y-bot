@@ -197,3 +197,65 @@ def sygnal_png(df5, nazwa, side, entry, sl, tp, bar_ts, strategia, fvg, tz_pl,
     _stopka(fig, f"Ryzyko 1R = {ryzyko:,.2f}   ·   cel = 3R = {3*ryzyko:,.2f}   ·   "
                  f"jeden cel, jeden stop, bez przesuwania")
     return _zapisz(fig)
+
+
+def czuwanie_png(df5, nazwa, side, poziom, entry, sl, tp, zamkniecie, tz_pl,
+                 n_swiec=70):
+    """Obrazek CZUWANIA: co musi zrobic NASTEPNA swieca, zebysmy weszli.
+
+    Rozni sie od sygnal_png tym, ze nic jeszcze nie padlo - pokazujemy poziom,
+    ktorego swieca musi sie utrzymac, i orientacyjne poziomy wejscia. Wszystko
+    przerywane, bo to zapowiedz, a nie fakt.
+    """
+    d = df5.tail(n_swiec)
+    kolor_k = ZIELONY if side == "LONG" else CZERWONY
+    fig, ax = _osie(f"CZUWANIE  ·  mozliwy {side}  ·  {nazwa}",
+                    f"decyduje swieca zamykajaca sie o "
+                    f"{zamkniecie.astimezone(tz_pl).strftime('%H:%M')} (czas PL)")
+    _swiece(ax, d)
+    x_end = mdates.date2num(d.index[-1] + dt.timedelta(minutes=26))
+    ax.set_xlim(mdates.date2num(d.index[0] - dt.timedelta(minutes=6)), x_end)
+
+    # strefa, ktora musi zostac nienaruszona
+    if side == "LONG":
+        ax.axhspan(poziom - abs(entry - poziom) * 0.02, poziom,
+                   color=CZERWONY, alpha=0.10, zorder=1)
+    else:
+        ax.axhspan(poziom, poziom + abs(poziom - entry) * 0.02,
+                   color=CZERWONY, alpha=0.10, zorder=1)
+
+    # Poziom do utrzymania lezy zwykle kilka dolarow od wejscia (to szczyt
+    # poprzedniej swiecy), wiec etykiety po tej samej stronie nachodzilyby na
+    # siebie - ta idzie na LEWA krawedz wykresu.
+    x_left = mdates.date2num(d.index[0] - dt.timedelta(minutes=4))
+    ax.axhline(poziom, color=ZLOTY, linestyle="-", linewidth=2.0, zorder=4)
+    ax.annotate(f"MUSI SIE UTRZYMAC  {poziom:,.2f}", xy=(x_left, poziom),
+                xytext=(4, 12), textcoords="offset points", color=ZLOTY,
+                fontsize=9.5, fontweight="bold", va="center", ha="left",
+                bbox=dict(boxstyle="round,pad=0.28", facecolor=TLO,
+                          edgecolor=ZLOTY, linewidth=0.9), zorder=6)
+    _poziom(ax, entry, NIEBIESKI, f"wejscie ~{entry:,.2f}", x_end,
+            styl=":", grubosc=1.4, alpha=0.85)
+    _poziom(ax, sl, CZERWONY, f"stop ~{sl:,.2f}", x_end, styl=":",
+            grubosc=1.2, alpha=0.85)
+    _poziom(ax, tp, ZIELONY, f"cel ~{tp:,.2f}  (+3R)", x_end, styl=":",
+            grubosc=1.2, alpha=0.85)
+
+    # strzalka na miejsce, gdzie powstanie decydujaca swieca
+    x_nast = mdates.date2num(d.index[-1] + dt.timedelta(minutes=5))
+    rozp = float(d["High"].max() - d["Low"].min())
+    znak = -1 if side == "LONG" else 1
+    ax.annotate("TA swieca zdecyduje",
+                xy=(x_nast, entry),
+                xytext=(mdates.date2num(d.index[-1] - dt.timedelta(minutes=70)),
+                        entry - znak * rozp * 0.38),
+                color=kolor_k, fontsize=10, fontweight="bold", ha="center",
+                arrowprops=dict(arrowstyle="->", color=kolor_k, linewidth=1.8,
+                                connectionstyle="arc3,rad=0.15"),
+                zorder=7)
+
+    _os_czasu(ax, tz_pl)
+    ryzyko = abs(entry - sl)
+    _stopka(fig, f"To ZAPOWIEDZ, nie sygnal   ·   ryzyko 1R = {ryzyko:,.2f}   ·   "
+                 f"potwierdzenie dopiero na zamknieciu swiecy")
+    return _zapisz(fig)
