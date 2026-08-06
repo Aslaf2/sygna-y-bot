@@ -1452,10 +1452,10 @@
   "instrument": "HK50 (Hang Seng)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-05T08:24:18.171314+00:00"
+  "rozliczono_utc": "2026-08-06T01:45:06.998848+00:00"
  },
  "2026-08-05T18:22:10.359504+00:00": {
   "instrument": "XAUUSD (zloto)",
