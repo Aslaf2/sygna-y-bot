@@ -1,14 +1,14 @@
 {
- "czas_utc": "2026-08-09T22:27:21.177457+00:00",
- "czas_pl": "10.08.2026 00:27",
+ "czas_utc": "2026-08-09T22:32:33.268757+00:00",
+ "czas_pl": "10.08.2026 00:32",
  "instrumenty": {
   "XAUUSD (zloto)": {
-   "etap": "scan",
-   "kandydaci": 0,
+   "etap": "detect",
+   "kandydaci": 1,
    "zatwierdzone": 0,
    "wyslane": false,
-   "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2135
+   "opis": "kandydaci odrzuceni przez walidator",
+   "bars": 2136
   },
   "XAGUSD (srebro)": {
    "etap": "scan",
@@ -16,15 +16,15 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2134
+   "bars": 2135
   },
   "BRENT (ropa)": {
-   "etap": "detect",
-   "kandydaci": 1,
+   "etap": "scan",
+   "kandydaci": 0,
    "zatwierdzone": 0,
    "wyslane": false,
-   "opis": "kandydaci odrzuceni przez walidator",
-   "bars": 1417
+   "opis": "brak setupu na ostatnich swiecach",
+   "bars": 1414
   },
   "HK50 (Hang Seng)": {
    "etap": "scan",
@@ -52,12 +52,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-08-09T02:40:48.892872+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-08-09T02:45:59.213992+00:00",
    "k": 0,
@@ -1248,6 +1242,12 @@
   },
   {
    "t": "2026-08-09T22:27:21.177457+00:00",
+   "k": 1,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-08-09T22:32:33.268757+00:00",
    "k": 1,
    "z": 0,
    "w": 0
