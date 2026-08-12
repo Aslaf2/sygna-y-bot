@@ -1659,10 +1659,10 @@
   "instrument": "BRENT (ropa)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-12T00:22:25.323754+00:00"
+  "rozliczono_utc": "2026-08-12T09:34:00.399625+00:00"
  },
  "2026-08-12T00:32:41.136136+00:00": {
   "instrument": "XAUUSD (zloto)",
