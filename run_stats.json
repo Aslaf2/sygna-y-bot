@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-08-12T19:07:01.623025+00:00",
- "czas_pl": "12.08.2026 21:07",
+ "czas_utc": "2026-08-12T19:12:12.511586+00:00",
+ "czas_pl": "12.08.2026 21:12",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "cooldown",
@@ -15,7 +15,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2181
+   "bars": 2182
   },
   "BRENT (ropa)": {
    "etap": "scan",
@@ -23,7 +23,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 1933
+   "bars": 1788
   },
   "HK50 (Hang Seng)": {
    "etap": "scan",
@@ -39,7 +39,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.23R/sygnal 30d, -7.3R live)",
-   "bars": 2798
+   "bars": 2799
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -47,16 +47,10 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.23R/sygnal 30d, -7.3R live)",
-   "bars": 770
+   "bars": 771
   }
  },
  "historia": [
-  {
-   "t": "2026-08-12T02:16:56.107326+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-08-12T02:22:07.666496+00:00",
    "k": 0,
@@ -1247,6 +1241,12 @@
   },
   {
    "t": "2026-08-12T19:07:01.623025+00:00",
+   "k": 0,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-08-12T19:12:12.511586+00:00",
    "k": 0,
    "z": 0,
    "w": 0
