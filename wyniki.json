@@ -1677,10 +1677,10 @@
   "instrument": "XAGUSD (srebro)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "TP",
+  "r": 3.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-12T00:32:47.141301+00:00"
+  "rozliczono_utc": "2026-08-12T02:53:30.260559+00:00"
  },
  "2026-08-12T00:43:06.650428+00:00": {
   "instrument": "BRENT (ropa)",
