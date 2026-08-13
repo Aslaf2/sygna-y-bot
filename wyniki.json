@@ -1735,5 +1735,23 @@
   "r": 0.0,
   "model": "3R",
   "rozliczono_utc": "2026-08-13T00:19:26.923370+00:00"
+ },
+ "2026-08-13T00:24:33.345364+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-08-13T00:24:38.139084+00:00"
+ },
+ "2026-08-13T00:24:34.827915+00:00": {
+  "instrument": "BRENT (ropa)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-08-13T00:24:38.139703+00:00"
  }
 }
