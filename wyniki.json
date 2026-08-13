@@ -1704,10 +1704,10 @@
   "instrument": "XAUUSD (zloto)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-12T18:35:57.809582+00:00"
+  "rozliczono_utc": "2026-08-13T04:13:43.237245+00:00"
  },
  "2026-08-12T18:46:18.826002+00:00": {
   "instrument": "BRENT (ropa)",
@@ -1722,19 +1722,19 @@
   "instrument": "XAUUSD (zloto)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-12T19:01:56.880758+00:00"
+  "rozliczono_utc": "2026-08-13T04:13:43.666810+00:00"
  },
  "2026-08-13T00:19:21.322215+00:00": {
   "instrument": "XAUUSD (zloto)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-13T00:19:26.923370+00:00"
+  "rozliczono_utc": "2026-08-13T04:13:44.071358+00:00"
  },
  "2026-08-13T00:24:33.345364+00:00": {
   "instrument": "XAGUSD (srebro)",
@@ -1758,10 +1758,10 @@
   "instrument": "XAUUSD (zloto)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-13T00:40:10.589767+00:00"
+  "rozliczono_utc": "2026-08-13T04:13:44.455474+00:00"
  },
  "2026-08-13T00:50:28.354428+00:00": {
   "instrument": "BRENT (ropa)",
