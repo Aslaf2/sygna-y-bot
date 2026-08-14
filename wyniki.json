@@ -1803,10 +1803,10 @@
   "instrument": "XAGUSD (srebro)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "TP",
+  "r": 3.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-13T18:43:15.267392+00:00"
+  "rozliczono_utc": "2026-08-14T05:44:25.283400+00:00"
  },
  "2026-08-13T18:48:26.207000+00:00": {
   "instrument": "BRENT (ropa)",
@@ -1866,9 +1866,9 @@
   "instrument": "BRENT (ropa)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-14T01:08:04.399831+00:00"
+  "rozliczono_utc": "2026-08-14T05:44:25.676890+00:00"
  }
 }
