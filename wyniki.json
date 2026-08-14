@@ -1785,10 +1785,10 @@
   "instrument": "BRENT (ropa)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-13T18:17:19.196222+00:00"
+  "rozliczono_utc": "2026-08-14T06:41:24.102338+00:00"
  },
  "2026-08-13T18:43:08.821127+00:00": {
   "instrument": "XAUUSD (zloto)",
@@ -1812,10 +1812,10 @@
   "instrument": "BRENT (ropa)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-13T18:48:30.000930+00:00"
+  "rozliczono_utc": "2026-08-14T06:41:24.439216+00:00"
  },
  "2026-08-13T19:03:59.082295+00:00": {
   "instrument": "XAGUSD (srebro)",
