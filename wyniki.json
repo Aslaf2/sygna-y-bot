@@ -1848,10 +1848,10 @@
   "instrument": "BRENT (ropa)",
   "strona": "SHORT",
   "strategia": "Liquidity Sweep",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-14T00:47:19.752548+00:00"
+  "rozliczono_utc": "2026-08-14T01:18:26.729981+00:00"
  },
  "2026-08-14T01:02:48.021382+00:00": {
   "instrument": "XAGUSD (srebro)",
