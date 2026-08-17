@@ -73,7 +73,7 @@ MIN_SCORE = {"EURUSD=X": 4}
 # Sygnaly WYLACZONE per instrument (dane nadal pobierane - potrzebne do SETTLE).
 # Dowod (14.07, backtest 30d modelem R + 81 sygnalow live): US100 traci w obu
 # zbiorach (-0.23R/sygnal na n=45 backtest; -7.3R live) - wylaczony.
-NO_SIGNAL_SYMS = {"^NDX", "EURUSD=X"}
+NO_SIGNAL_SYMS = {"^NDX", "EURUSD=X", "BZ=F"}
 # 04.08.2026 doszly EURUSD i BRENT (decyzja usera po przegladzie wynikow live
 # z wyniki.json, 145 rozliczonych sygnalow):
 #   EURUSD  n=15  -11.0R  -0.73R/sygnal  trafnosc 7%  <- najgorszy z calego zestawu
@@ -90,6 +90,35 @@ NO_SIGNAL_SYMS = {"^NDX", "EURUSD=X"}
 # Ta sama pomylka dotyczyla HK50 (handlowal wylacznie w Londynie) - dlatego przy
 # ocenie rynku ZAWSZE rozbijac wynik na sesje, zanim sie cokolwiek wylaczy.
 # EURUSD zostaje wylaczony: jego straty rozkladaja sie na wszystkie sesje.
+#
+# 17.08.2026 BRENT WYLACZONY PONOWNIE - i tym razem NIE jest to pomylka
+# atrybucji sesji, bo Londyn jest wyciety od 05.08, a Brent handluje glownie
+# w Azji (16 z 31 sygnalow o godz. 20 NY) i NY PM. Dowod (live, wyniki.json):
+#   Brent calosc live:        n=31  1 cel / 27 stopow  -24.0R  -0.77R/sygnal
+#   Brent od przywrocenia:    n=21  0 celow            -20.0R  -0.95R/sygnal
+# Prawdopodobienstwo <=1 celu na 31 przy najskromniejszym zalozeniu (25% = prog
+# oplacalnosci przy TP 3R): 0.15%. Przy 40% z backtestu: 0.0003%. Przy 0/21 od
+# przywrocenia: 0.24% / 0.0022%. To nie jest pech - backtest (+0.55R/sygnal,
+# win 40%) po prostu nie opisuje tego rynku live. Odwrotnie niz przy pierwszym
+# wylaczeniu, gdzie probka byla za mala (n=8) i zle przypisana do sesji.
+# Efekt na portfelu (dzisiejsza konfiguracja, 106 rozliczonych):
+#   z Brentem:   106 sygn.  win 27.4%  +16.0R  +0.15R/sygnal
+#   bez Brenta:   81 sygn.  win 34.6%  +36.0R  +0.44R/sygnal
+# Zostaja zlote/srebro: XAUUSD n=43 win 34.9% +20.0R, XAGUSD n=38 win 34.2%
+# +16.0R - oba ~10 pkt nad progiem oplacalnosci.
+# Powod wylaczenia per instrument - trafia na dashboard w kolumnie INFO.
+# Wczesniej byl tu jeden hardcode z liczbami US100, wiec panel pokazywal
+# "-0.23R/sygnal 30d, -7.3R live" takze dla EURUSD (i pokazalby dla Brenta).
+POWOD_WYLACZENIA = {
+    "^NDX":     "traci: -0.23R/sygnal 30d, -7.3R live",
+    "EURUSD=X": "traci: -0.73R/sygnal live, n=15, trafnosc 7%",
+    "BZ=F":     "traci: -0.77R/sygnal live, n=31, 1 cel / 27 stopow",
+}
+# GDYBY WRACAC: wymagac >=40 sygnalow live nowego backtestu na czystej probce
+# BEZ Londynu, nie samego backtestu 60d - ten sie dla ropy dwa razy pomylil.
+# UWAGA: obserwowac same metale - od wyciecia Londynu maja 6 celow na 33
+# (-4.0R). Wzgledem ich wlasnych 34.6% to P=3.1%, ale wzgledem progu 25% juz
+# P=24.7%, czyli za malo dowodow na jakakolwiek zmiane. Sprawdzic w przegladzie.
 
 # Godziny NY, w ktorych NIE szukamy setupow. Dowod (14.07): killzone NY AM
 # (10-11) ma ~0R na backtescie 30d i -20.4R na 81 sygnalach live; wyciecie
@@ -907,7 +936,8 @@ def main():
             if sym in NO_SIGNAL_SYMS:
                 print(f"{name}: sygnaly wylaczone")
                 ins["etap"] = "wylaczony"
-                ins["opis"] = "sygnaly wylaczone (traci: -0.23R/sygnal 30d, -7.3R live)"
+                ins["opis"] = "sygnaly wylaczone (" + POWOD_WYLACZENIA.get(
+                    sym, "traci na danych live") + ")"
                 time.sleep(1); continue
 
             dff = df.iloc[:-1]

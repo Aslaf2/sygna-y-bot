@@ -60,7 +60,7 @@
   <div class="head">
     <h1>SMC × TELEGRAM</h1>
     <span class="live"><span class="dot"></span>LIVE</span>
-    <span class="sub">@Aslafekbot · XAUUSD / XAGUSD / BRENT · killzone NY PM + Azja · 5M · ICT</span>
+    <span class="sub">@Aslafekbot · XAUUSD / XAGUSD · killzone NY PM + Azja · 5M · ICT</span>
     <span class="sub" id="lastscan" style="margin-left:auto">—</span>
   </div>
   <div id="err"></div>
@@ -68,7 +68,7 @@
   <div class="switch">
     <button id="btn-akt" class="on" onclick="ustawWidok('aktualny')">AKTUALNY BOT</button>
     <button id="btn-hist" onclick="ustawWidok('historia')">CAŁA HISTORIA</button>
-    <span class="note" id="widok-note">sygnały wg dzisiejszych filtrów (bez US100 / EURUSD@3pkt / NY AM / niezgodnych z TV)</span>
+    <span class="note" id="widok-note">sygnały wg dzisiejszych filtrów (tylko XAUUSD+XAGUSD, NY PM + Azja, zgodne z TV)</span>
   </div>
 
   <div class="grid" id="tiles"></div>
@@ -187,7 +187,7 @@ function ustawWidok(w){
   document.getElementById("btn-akt").classList.toggle("on", w==="aktualny");
   document.getElementById("btn-hist").classList.toggle("on", w==="historia");
   document.getElementById("widok-note").textContent = w==="aktualny"
-    ? "sygnały wg dzisiejszych filtrów (bez US100 / EURUSD@3pkt / NY AM / niezgodnych z TV)"
+    ? "sygnały wg dzisiejszych filtrów (tylko XAUUSD+XAGUSD, NY PM + Azja, zgodne z TV)"
     : "wszystkie sygnały od startu, także z instrumentów i godzin już wyciętych";
   odswiez();
 }
@@ -199,6 +199,19 @@ function godzinaNY(iso){
   }catch(e){ return -1; }
 }
 
+// Minuty od polnocy w czasie NY. Kolumna swieca ma rozne offsety zaleznie od
+// instrumentu (HK50 +08:00, EURUSD +01:00, metale/Brent -04:00), wiec bez
+// konwersji do NY sygnaly HK50 z Londynu udawaly NY PM.
+function minutyNY(iso){
+  try{
+    const s = new Date(iso).toLocaleString("en-US",
+      {timeZone:"America/New_York", hour:"2-digit", minute:"2-digit",
+       hour12:false});
+    const [h, m] = s.split(", ").pop().split(":").map(Number);
+    return h*60 + m;
+  }catch(e){ return -1; }
+}
+
 function tvZgodny(tv, strona){
   if (!tv) return true;               // era sprzed integracji TV - neutralnie
   const k = tv.split(" ")[0].replace("STRONG_","");
@@ -207,13 +220,23 @@ function tvZgodny(tv, strona){
   return false;                       // NEUTRAL
 }
 
-// te same filtry, ktore dzis obowiazuja w smc_bot.py
+// Te same filtry, ktore dzis obowiazuja w smc_bot.py. MUSZA byc trzymane w
+// zgodzie z NO_SIGNAL_SYMS + SKIP_NY_HOURS + in_killzone - inaczej ten widok
+// klamie. Tak wlasnie bylo do 17.08.2026: brakowalo wyciecia Londynu (05.08) i
+// pelnego wylaczenia EURUSD, wiec "AKTUALNY BOT" wliczal 47 sygnalow z Londynu
+// i wszystkie 8 z HK50 - pokazywal 153 sygn. / win 25.5% / +11.0R zamiast
+// prawdziwych 106 / 27.4% / +16.0R.
+const WYLACZONE_INSTR = ["US100", "EURUSD", "BRENT"];  // = NO_SIGNAL_SYMS
+// = in_killzone() minus SKIP_NY_HOURS. Zakresy w MINUTACH czasu NY, dokladnie
+// jak w bocie: NY PM 14:00-15:00 i Azja 20:00-21:00, oba domkniete z obu stron.
+// Liczenie w calych godzinach byloby niewierne (wpuszczaloby np. 15:30).
+const OKNA_NY = [[14*60, 15*60], [20*60, 21*60]];
+
 function aktualnaKonfig(s){
   const ins = s.instrument.split(" ")[0];
-  if (ins==="US100") return false;
-  if (ins==="EURUSD" && s.score!=="4") return false;
-  const h = godzinaNY(s.swieca);
-  if (h===10 || h===11) return false;
+  if (WYLACZONE_INSTR.includes(ins)) return false;
+  const t = minutyNY(s.swieca);
+  if (!OKNA_NY.some(([a,b]) => t>=a && t<=b)) return false;  // wycina Londyn 3-4 i NY AM 10-11
   return tvZgodny(s.tv, s.strona);
 }
 
