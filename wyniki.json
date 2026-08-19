@@ -1965,19 +1965,19 @@
   "instrument": "XAUUSD (zloto)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-18T18:20:33.107695+00:00"
+  "rozliczono_utc": "2026-08-19T11:16:49.923762+00:00"
  },
  "2026-08-18T19:02:39.144051+00:00": {
   "instrument": "XAUUSD (zloto)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-08-18T19:02:46.185755+00:00"
+  "rozliczono_utc": "2026-08-19T11:16:50.389841+00:00"
  },
  "2026-08-18T19:02:40.856734+00:00": {
   "instrument": "XAGUSD (srebro)",
