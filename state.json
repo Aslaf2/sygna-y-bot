@@ -61,7 +61,8 @@
     "USD|Retail Sales m/m|2026-08-14T08:30:00-04:00",
     "USD|Prelim UoM Consumer Sentiment|2026-08-14T10:00:00-04:00",
     "USD|Prelim UoM Inflation Expectations|2026-08-14T10:00:00-04:00",
-    "USD|President Trump Speaks|2026-08-14T15:00:00-04:00"
+    "USD|President Trump Speaks|2026-08-14T15:00:00-04:00",
+    "EUR|ECB President Lagarde Speaks|2026-08-19T03:10:00-04:00"
   ],
   "daily_summary": "2026-08-19",
   "sent_bars": {
