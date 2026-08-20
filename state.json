@@ -65,7 +65,9 @@
     "EUR|ECB President Lagarde Speaks|2026-08-19T03:10:00-04:00",
     "EUR|ECB President Lagarde Speaks|2026-08-19T06:15:00-04:00",
     "USD|FOMC Meeting Minutes|2026-08-19T14:00:00-04:00",
-    "USD|President Trump Speaks|2026-08-19T14:30:00-04:00"
+    "USD|President Trump Speaks|2026-08-19T14:30:00-04:00",
+    "USD|Philly Fed Manufacturing Index|2026-08-20T08:30:00-04:00",
+    "USD|Unemployment Claims|2026-08-20T08:30:00-04:00"
   ],
   "daily_summary": "2026-08-20",
   "sent_bars": {
