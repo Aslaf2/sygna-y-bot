@@ -72,7 +72,8 @@
     "EUR|French Flash Services PMI|2026-08-21T03:15:00-04:00",
     "EUR|German Flash Manufacturing PMI|2026-08-21T03:30:00-04:00",
     "EUR|German Flash Services PMI|2026-08-21T03:30:00-04:00",
-    "USD|President Trump Speaks|2026-08-21T19:00:00-04:00"
+    "USD|President Trump Speaks|2026-08-21T19:00:00-04:00",
+    "USD|Treasury Sec Bessent Speaks|2026-08-24T13:00:00-04:00"
   ],
   "daily_summary": "2026-08-24",
   "sent_bars": {
