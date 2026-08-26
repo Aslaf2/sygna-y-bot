@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-08-26T02:06:35.477894+00:00",
- "czas_pl": "26.08.2026 04:06",
+ "czas_utc": "2026-08-26T02:11:45.971186+00:00",
+ "czas_pl": "26.08.2026 04:11",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "scan",
@@ -32,7 +32,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 635
+   "bars": 636
   },
   "EURUSD": {
    "etap": "wylaczony",
@@ -40,7 +40,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.73R/sygnal live, n=15, trafnosc 7%)",
-   "bars": 2567
+   "bars": 2568
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -52,12 +52,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-08-25T09:16:04.144795+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-08-25T09:21:15.574634+00:00",
    "k": 0,
@@ -1248,6 +1242,12 @@
   },
   {
    "t": "2026-08-26T02:06:35.477894+00:00",
+   "k": 0,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-08-26T02:11:45.971186+00:00",
    "k": 0,
    "z": 0,
    "w": 0
