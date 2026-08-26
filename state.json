@@ -74,7 +74,10 @@
     "EUR|German Flash Services PMI|2026-08-21T03:30:00-04:00",
     "USD|President Trump Speaks|2026-08-21T19:00:00-04:00",
     "USD|Treasury Sec Bessent Speaks|2026-08-24T13:00:00-04:00",
-    "USD|CB Consumer Confidence|2026-08-25T10:00:00-04:00"
+    "USD|CB Consumer Confidence|2026-08-25T10:00:00-04:00",
+    "USD|Core PCE Price Index m/m|2026-08-26T08:30:00-04:00",
+    "USD|Prelim GDP q/q|2026-08-26T08:30:00-04:00",
+    "USD|Prelim GDP Price Index q/q|2026-08-26T08:30:00-04:00"
   ],
   "daily_summary": "2026-08-26",
   "sent_bars": {
