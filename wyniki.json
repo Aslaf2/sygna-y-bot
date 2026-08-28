@@ -2167,5 +2167,14 @@
   "r": 0.0,
   "model": "3R",
   "rozliczono_utc": "2026-08-28T00:38:05.928489+00:00"
+ },
+ "2026-08-28T00:59:21.614090+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-08-28T00:59:27.295856+00:00"
  }
 }
