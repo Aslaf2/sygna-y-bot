@@ -78,7 +78,11 @@
     "USD|Core PCE Price Index m/m|2026-08-26T08:30:00-04:00",
     "USD|Prelim GDP q/q|2026-08-26T08:30:00-04:00",
     "USD|Prelim GDP Price Index q/q|2026-08-26T08:30:00-04:00",
-    "USD|Unemployment Claims|2026-08-27T08:30:00-04:00"
+    "USD|Unemployment Claims|2026-08-27T08:30:00-04:00",
+    "USD|Fed Chairman Warsh Speaks|2026-08-28T10:00:00-04:00",
+    "USD|Prelim Benchmark Payrolls Revision|2026-08-28T10:00:00-04:00",
+    "USD|Revised UoM Consumer Sentiment|2026-08-28T10:00:00-04:00",
+    "USD|Revised UoM Inflation Expectations|2026-08-28T10:00:00-04:00"
   ],
   "daily_summary": "2026-08-28",
   "sent_bars": {
