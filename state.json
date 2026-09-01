@@ -85,7 +85,10 @@
     "USD|Revised UoM Inflation Expectations|2026-08-28T10:00:00-04:00",
     "EUR|German Prelim CPI m/m|2026-08-31T02:29:00-04:00",
     "EUR|Core CPI Flash Estimate y/y|2026-09-01T05:00:00-04:00",
-    "EUR|CPI Flash Estimate y/y|2026-09-01T05:00:00-04:00"
+    "EUR|CPI Flash Estimate y/y|2026-09-01T05:00:00-04:00",
+    "USD|ISM Manufacturing PMI|2026-09-01T10:00:00-04:00",
+    "USD|ISM Manufacturing Prices|2026-09-01T10:00:00-04:00",
+    "USD|JOLTS Job Openings|2026-09-01T10:00:00-04:00"
   ],
   "daily_summary": "2026-09-01",
   "sent_bars": {
