@@ -88,7 +88,8 @@
     "EUR|CPI Flash Estimate y/y|2026-09-01T05:00:00-04:00",
     "USD|ISM Manufacturing PMI|2026-09-01T10:00:00-04:00",
     "USD|ISM Manufacturing Prices|2026-09-01T10:00:00-04:00",
-    "USD|JOLTS Job Openings|2026-09-01T10:00:00-04:00"
+    "USD|JOLTS Job Openings|2026-09-01T10:00:00-04:00",
+    "USD|ADP Non-Farm Employment Change|2026-09-02T08:15:00-04:00"
   ],
   "daily_summary": "2026-09-02",
   "sent_bars": {
