@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-09-07T08:08:04.957126+00:00",
- "czas_pl": "07.09.2026 10:08",
+ "czas_utc": "2026-09-07T08:13:15.519014+00:00",
+ "czas_pl": "07.09.2026 10:13",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "scan",
@@ -32,7 +32,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 697
+   "bars": 698
   },
   "EURUSD": {
    "etap": "wylaczony",
@@ -40,7 +40,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.73R/sygnal live, n=15, trafnosc 7%)",
-   "bars": 2666
+   "bars": 2667
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -52,12 +52,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-09-06T15:25:31.138731+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-09-06T15:26:11.174155+00:00",
    "k": 0,
@@ -1248,6 +1242,12 @@
   },
   {
    "t": "2026-09-07T08:08:04.957126+00:00",
+   "k": 0,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-09-07T08:13:15.519014+00:00",
    "k": 0,
    "z": 0,
    "w": 0
