@@ -1,5 +1,5 @@
 {
- "czas_utc": "2026-09-08T18:58:06.175906+00:00",
+ "czas_utc": "2026-09-08T18:58:43.783044+00:00",
  "czas_pl": "08.09.2026 20:58",
  "instrumenty": {
   "XAUUSD (zloto)": {
@@ -11,11 +11,11 @@
    "bars": 2037
   },
   "XAGUSD (srebro)": {
-   "etap": "detect",
+   "etap": "fill",
    "kandydaci": 1,
-   "zatwierdzone": 0,
-   "wyslane": false,
-   "opis": "kandydaci odrzuceni przez walidator",
+   "zatwierdzone": 1,
+   "wyslane": true,
+   "opis": "WYSLANO SHORT (Silver Bullet, 3 pkt)",
    "bars": 2038
   },
   "BRENT (ropa)": {
@@ -52,12 +52,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-09-08T02:09:31.109072+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-09-08T02:14:42.096485+00:00",
    "k": 0,
@@ -1251,6 +1245,12 @@
    "k": 1,
    "z": 0,
    "w": 0
+  },
+  {
+   "t": "2026-09-08T18:58:43.783044+00:00",
+   "k": 1,
+   "z": 1,
+   "w": 1
   }
  ]
 }
