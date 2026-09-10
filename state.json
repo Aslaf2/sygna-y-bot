@@ -93,7 +93,9 @@
     "USD|Average Hourly Earnings m/m|2026-09-04T08:30:00-04:00",
     "USD|Non-Farm Employment Change|2026-09-04T08:30:00-04:00",
     "USD|Unemployment Rate|2026-09-04T08:30:00-04:00",
-    "USD|President Trump Speaks|2026-09-09T21:15:00-04:00"
+    "USD|President Trump Speaks|2026-09-09T21:15:00-04:00",
+    "EUR|Main Refinancing Rate|2026-09-10T08:15:00-04:00",
+    "EUR|Monetary Policy Statement|2026-09-10T08:15:00-04:00"
   ],
   "daily_summary": "2026-09-10",
   "sent_bars": {
