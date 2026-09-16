@@ -1,6 +1,5 @@
 {
   "sent_events": [
-    "USD|Core Retail Sales m/m|2026-07-16T08:30:00-04:00",
     "USD|Philly Fed Manufacturing Index|2026-07-16T08:30:00-04:00",
     "USD|Retail Sales m/m|2026-07-16T08:30:00-04:00",
     "USD|Unemployment Claims|2026-07-16T08:30:00-04:00",
@@ -99,7 +98,8 @@
     "USD|Retail Sales m/m|2026-09-16T08:30:00-04:00",
     "USD|Federal Funds Rate|2026-09-16T14:00:00-04:00",
     "USD|FOMC Economic Projections|2026-09-16T14:00:00-04:00",
-    "USD|FOMC Statement|2026-09-16T14:00:00-04:00"
+    "USD|FOMC Statement|2026-09-16T14:00:00-04:00",
+    "USD|FOMC Press Conference|2026-09-16T14:30:00-04:00"
   ],
   "daily_summary": "2026-09-16",
   "sent_bars": {
