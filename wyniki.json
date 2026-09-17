@@ -2469,10 +2469,10 @@
   "instrument": "XAUUSD (zloto)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-09-16T18:33:53.651558+00:00"
+  "rozliczono_utc": "2026-09-17T12:31:22.764450+00:00"
  },
  "2026-09-16T18:33:48.959441+00:00": {
   "instrument": "XAGUSD (srebro)",
