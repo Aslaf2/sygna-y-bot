@@ -1,6 +1,5 @@
 {
   "sent_events": [
-    "EUR|ECB Press Conference|2026-07-23T08:45:00-04:00",
     "EUR|French Flash Manufacturing PMI|2026-07-24T03:15:00-04:00",
     "EUR|French Flash Services PMI|2026-07-24T03:15:00-04:00",
     "EUR|German Flash Manufacturing PMI|2026-07-24T03:30:00-04:00",
@@ -99,7 +98,8 @@
     "EUR|French Flash Manufacturing PMI|2026-09-23T03:15:00-04:00",
     "EUR|French Flash Services PMI|2026-09-23T03:15:00-04:00",
     "EUR|German Flash Manufacturing PMI|2026-09-23T03:30:00-04:00",
-    "EUR|German Flash Services PMI|2026-09-23T03:30:00-04:00"
+    "EUR|German Flash Services PMI|2026-09-23T03:30:00-04:00",
+    "USD|Unemployment Claims|2026-09-24T08:30:00-04:00"
   ],
   "daily_summary": "2026-09-24",
   "sent_bars": {
