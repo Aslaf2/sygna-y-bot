@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-09-24T18:11:29.638825+00:00",
- "czas_pl": "24.09.2026 20:11",
+ "czas_utc": "2026-09-24T18:16:40.916967+00:00",
+ "czas_pl": "24.09.2026 20:16",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "scan",
@@ -8,15 +8,15 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2376
+   "bars": 2377
   },
   "XAGUSD (srebro)": {
-   "etap": "scan",
-   "kandydaci": 0,
+   "etap": "detect",
+   "kandydaci": 1,
    "zatwierdzone": 0,
    "wyslane": false,
-   "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2374
+   "opis": "kandydaci odrzuceni przez walidator",
+   "bars": 2375
   },
   "BRENT (ropa)": {
    "etap": "wylaczony",
@@ -24,7 +24,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.77R/sygnal live, n=31, 1 cel / 27 stopow)",
-   "bars": 2277
+   "bars": 2278
   },
   "HK50 (Hang Seng)": {
    "etap": "scan",
@@ -40,7 +40,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.73R/sygnal live, n=15, trafnosc 7%)",
-   "bars": 2787
+   "bars": 2788
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -48,16 +48,10 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.23R/sygnal 30d, -7.3R live)",
-   "bars": 759
+   "bars": 760
   }
  },
  "historia": [
-  {
-   "t": "2026-09-24T01:25:11.593679+00:00",
-   "k": 1,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-09-24T01:30:22.326306+00:00",
    "k": 0,
@@ -1249,6 +1243,12 @@
   {
    "t": "2026-09-24T18:11:29.638825+00:00",
    "k": 0,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-09-24T18:16:40.916967+00:00",
+   "k": 1,
    "z": 0,
    "w": 0
   }
