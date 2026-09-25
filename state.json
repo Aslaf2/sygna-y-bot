@@ -1,7 +1,5 @@
 {
   "sent_events": [
-    "EUR|German Flash Manufacturing PMI|2026-07-24T03:30:00-04:00",
-    "EUR|German Flash Services PMI|2026-07-24T03:30:00-04:00",
     "USD|President Trump Speaks|2026-07-24T20:55:00-04:00",
     "USD|President Trump Speaks|2026-07-27T14:50:00-04:00",
     "USD|CB Consumer Confidence|2026-07-28T10:00:00-04:00",
@@ -99,7 +97,9 @@
     "EUR|German Flash Services PMI|2026-09-23T03:30:00-04:00",
     "USD|Unemployment Claims|2026-09-24T08:30:00-04:00",
     "USD|President Trump Speaks|2026-09-24T10:15:00-04:00",
-    "USD|President Trump Speaks|2026-09-24T19:55:00-04:00"
+    "USD|President Trump Speaks|2026-09-24T19:55:00-04:00",
+    "USD|Revised UoM Consumer Sentiment|2026-09-25T10:00:00-04:00",
+    "USD|Revised UoM Inflation Expectations|2026-09-25T10:00:00-04:00"
   ],
   "daily_summary": "2026-09-25",
   "sent_bars": {
