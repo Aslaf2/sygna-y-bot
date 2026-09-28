@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-09-28T00:55:00.957867+00:00",
- "czas_pl": "28.09.2026 02:55",
+ "czas_utc": "2026-09-28T01:00:12.289285+00:00",
+ "czas_pl": "28.09.2026 03:00",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "cooldown",
@@ -22,7 +22,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.77R/sygnal live, n=31, 1 cel / 27 stopow)",
-   "bars": 2083
+   "bars": 2085
   },
   "HK50 (Hang Seng)": {
    "etap": "scan",
@@ -38,7 +38,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.73R/sygnal live, n=15, trafnosc 7%)",
-   "bars": 2579
+   "bars": 2580
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -50,12 +50,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-09-27T08:10:30.286916+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-09-27T08:15:40.976333+00:00",
    "k": 0,
@@ -1246,6 +1240,12 @@
   },
   {
    "t": "2026-09-28T00:55:00.957867+00:00",
+   "k": 0,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-09-28T01:00:12.289285+00:00",
    "k": 0,
    "z": 0,
    "w": 0
