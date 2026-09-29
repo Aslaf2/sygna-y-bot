@@ -1,14 +1,14 @@
 {
- "czas_utc": "2026-09-29T00:35:20.913389+00:00",
- "czas_pl": "29.09.2026 02:35",
+ "czas_utc": "2026-09-29T00:40:32.626420+00:00",
+ "czas_pl": "29.09.2026 02:40",
  "instrumenty": {
   "XAUUSD (zloto)": {
-   "etap": "validate",
-   "kandydaci": 1,
-   "zatwierdzone": 1,
+   "etap": "scan",
+   "kandydaci": 0,
+   "zatwierdzone": 0,
    "wyslane": false,
-   "opis": "wstrzymany przez filtr TV (BUY)",
-   "bars": 2163
+   "opis": "brak setupu na ostatnich swiecach",
+   "bars": 2164
   },
   "XAGUSD (srebro)": {
    "etap": "cooldown",
@@ -23,7 +23,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.77R/sygnal live, n=31, 1 cel / 27 stopow)",
-   "bars": 2089
+   "bars": 2090
   },
   "HK50 (Hang Seng)": {
    "etap": "scan",
@@ -39,7 +39,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.73R/sygnal live, n=15, trafnosc 7%)",
-   "bars": 2556
+   "bars": 2557
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -51,12 +51,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-09-28T04:43:33.174599+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-09-28T04:48:43.818555+00:00",
    "k": 0,
@@ -1249,6 +1243,12 @@
    "t": "2026-09-29T00:35:20.913389+00:00",
    "k": 1,
    "z": 1,
+   "w": 0
+  },
+  {
+   "t": "2026-09-29T00:40:32.626420+00:00",
+   "k": 0,
+   "z": 0,
    "w": 0
   }
  ]
