@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-09-29T06:44:27.625358+00:00",
- "czas_pl": "29.09.2026 08:44",
+ "czas_utc": "2026-09-29T06:45:00.776871+00:00",
+ "czas_pl": "29.09.2026 08:45",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "scan",
@@ -16,7 +16,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 1931
+   "bars": 1932
   },
   "BRENT (ropa)": {
    "etap": "wylaczony",
@@ -32,7 +32,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 680
+   "bars": 681
   },
   "EURUSD": {
    "etap": "wylaczony",
@@ -52,12 +52,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-09-28T10:53:18.463794+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-09-28T10:58:29.206248+00:00",
    "k": 0,
@@ -1248,6 +1242,12 @@
   },
   {
    "t": "2026-09-29T06:44:27.625358+00:00",
+   "k": 0,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-09-29T06:45:00.776871+00:00",
    "k": 0,
    "z": 0,
    "w": 0
