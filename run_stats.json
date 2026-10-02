@@ -1,14 +1,13 @@
 {
- "czas_utc": "2026-10-02T01:19:13.836410+00:00",
- "czas_pl": "02.10.2026 03:19",
+ "czas_utc": "2026-10-02T01:24:24.881777+00:00",
+ "czas_pl": "02.10.2026 03:24",
  "instrumenty": {
   "XAUUSD (zloto)": {
-   "etap": "fill",
-   "kandydaci": 1,
-   "zatwierdzone": 1,
-   "wyslane": true,
-   "opis": "WYSLANO SHORT (Silver Bullet, 3 pkt)",
-   "bars": 2449
+   "etap": "cooldown",
+   "kandydaci": 0,
+   "zatwierdzone": 0,
+   "wyslane": false,
+   "opis": "pauza po ostatnim sygnale"
   },
   "XAGUSD (srebro)": {
    "etap": "cooldown",
@@ -23,7 +22,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.77R/sygnal live, n=31, 1 cel / 27 stopow)",
-   "bars": 2379
+   "bars": 2380
   },
   "HK50 (Hang Seng)": {
    "etap": "scan",
@@ -39,7 +38,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.73R/sygnal live, n=15, trafnosc 7%)",
-   "bars": 2573
+   "bars": 2574
   },
   "US100 (Nasdaq)": {
    "etap": "wylaczony",
@@ -51,12 +50,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-10-01T08:30:17.522805+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-10-01T08:35:28.502121+00:00",
    "k": 0,
@@ -1250,6 +1243,12 @@
    "k": 1,
    "z": 1,
    "w": 1
+  },
+  {
+   "t": "2026-10-02T01:24:24.881777+00:00",
+   "k": 0,
+   "z": 0,
+   "w": 0
   }
  ]
 }
