@@ -1,6 +1,5 @@
 {
   "sent_events": [
-    "USD|Core CPI y/y|2026-08-12T08:30:00-04:00",
     "USD|CPI m/m|2026-08-12T08:30:00-04:00",
     "USD|CPI y/y|2026-08-12T08:30:00-04:00",
     "USD|Core PPI m/m|2026-08-13T08:30:00-04:00",
@@ -99,7 +98,8 @@
     "USD|Average Hourly Earnings m/m|2026-10-02T08:30:00-04:00",
     "USD|Non-Farm Employment Change|2026-10-02T08:30:00-04:00",
     "USD|Unemployment Rate|2026-10-02T08:30:00-04:00",
-    "USD|ISM Services PMI|2026-10-05T10:00:00-04:00"
+    "USD|ISM Services PMI|2026-10-05T10:00:00-04:00",
+    "USD|President Trump Speaks|2026-10-07T13:00:00-04:00"
   ],
   "daily_summary": "2026-10-07",
   "sent_bars": {
