@@ -1,11 +1,5 @@
 {
   "sent_events": [
-    "USD|President Trump Speaks|2026-08-19T14:30:00-04:00",
-    "USD|Philly Fed Manufacturing Index|2026-08-20T08:30:00-04:00",
-    "USD|Unemployment Claims|2026-08-20T08:30:00-04:00",
-    "EUR|French Flash Manufacturing PMI|2026-08-21T03:15:00-04:00",
-    "EUR|French Flash Services PMI|2026-08-21T03:15:00-04:00",
-    "EUR|German Flash Manufacturing PMI|2026-08-21T03:30:00-04:00",
     "EUR|German Flash Services PMI|2026-08-21T03:30:00-04:00",
     "USD|President Trump Speaks|2026-08-21T19:00:00-04:00",
     "USD|Treasury Sec Bessent Speaks|2026-08-24T13:00:00-04:00",
@@ -99,7 +93,13 @@
     "USD|Core CPI y/y|2026-10-14T08:30:00-04:00",
     "USD|CPI m/m|2026-10-14T08:30:00-04:00",
     "USD|CPI y/y|2026-10-14T08:30:00-04:00",
-    "EUR|EU Economic Summit|2026-10-15T06:15:00-04:00"
+    "EUR|EU Economic Summit|2026-10-15T06:15:00-04:00",
+    "USD|Core PPI m/m|2026-10-15T08:30:00-04:00",
+    "USD|Core Retail Sales m/m|2026-10-15T08:30:00-04:00",
+    "USD|PPI m/m|2026-10-15T08:30:00-04:00",
+    "USD|Retail Sales m/m|2026-10-15T08:30:00-04:00",
+    "USD|Philly Fed Manufacturing Index|2026-10-15T08:30:00-04:00",
+    "USD|Unemployment Claims|2026-10-15T08:30:00-04:00"
   ],
   "daily_summary": "2026-10-15",
   "sent_bars": {
