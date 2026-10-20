@@ -331,5 +331,23 @@
   "r": 0.0,
   "model": "3R",
   "rozliczono_utc": "2026-10-19T18:54:50.547573+00:00"
+ },
+ "2026-10-20T00:37:42.321912+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-10-20T00:37:48.022163+00:00"
+ },
+ "2026-10-20T00:37:43.528137+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-10-20T00:37:48.022946+00:00"
  }
 }
