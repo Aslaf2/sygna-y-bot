@@ -354,18 +354,18 @@
   "instrument": "XAGUSD (srebro)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-10-21T18:52:25.131005+00:00"
+  "rozliczono_utc": "2026-10-21T19:02:51.954782+00:00"
  },
  "2026-10-21T18:57:31.672872+00:00": {
   "instrument": "XAGUSD (srebro)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-10-21T18:57:36.428703+00:00"
+  "rozliczono_utc": "2026-10-21T19:02:51.955295+00:00"
  }
 }
