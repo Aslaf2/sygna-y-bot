@@ -1,7 +1,5 @@
 {
   "sent_events": [
-    "USD|Treasury Sec Bessent Speaks|2026-08-24T13:00:00-04:00",
-    "USD|CB Consumer Confidence|2026-08-25T10:00:00-04:00",
     "USD|Core PCE Price Index m/m|2026-08-26T08:30:00-04:00",
     "USD|Prelim GDP q/q|2026-08-26T08:30:00-04:00",
     "USD|Prelim GDP Price Index q/q|2026-08-26T08:30:00-04:00",
@@ -99,7 +97,9 @@
     "USD|Philly Fed Manufacturing Index|2026-10-15T08:30:00-04:00",
     "USD|Unemployment Claims|2026-10-15T08:30:00-04:00",
     "USD|Fed Chairman Warsh Speaks|2026-10-15T23:30:00-04:00",
-    "USD|Unemployment Claims|2026-10-22T08:30:00-04:00"
+    "USD|Unemployment Claims|2026-10-22T08:30:00-04:00",
+    "EUR|French Flash Manufacturing PMI|2026-10-23T03:15:00-04:00",
+    "EUR|French Flash Services PMI|2026-10-23T03:15:00-04:00"
   ],
   "daily_summary": "2026-10-23",
   "sent_bars": {
