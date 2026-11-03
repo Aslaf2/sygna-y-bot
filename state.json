@@ -1,6 +1,5 @@
 {
   "sent_events": [
-    "USD|PPI m/m|2026-09-10T08:30:00-04:00",
     "USD|Unemployment Claims|2026-09-10T08:30:00-04:00",
     "EUR|ECB Press Conference|2026-09-10T08:45:00-04:00",
     "USD|Core CPI m/m|2026-09-11T08:30:00-04:00",
@@ -99,7 +98,8 @@
     "EUR|German Prelim GDP q/q|2026-10-30T05:00:00-04:00",
     "USD|Employment Cost Index q/q|2026-10-30T08:30:00-04:00",
     "USD|ISM Manufacturing PMI|2026-11-02T10:00:00-05:00",
-    "USD|JOLTS Job Openings|2026-11-03T10:00:00-05:00"
+    "USD|JOLTS Job Openings|2026-11-03T10:00:00-05:00",
+    "USD|Congressional Elections|2026-11-03T10:16:00-05:00"
   ],
   "daily_summary": "2026-11-03",
   "sent_bars": {
