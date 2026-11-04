@@ -3553,5 +3553,14 @@
   "r": 3.0,
   "model": "3R",
   "rozliczono_utc": "2026-11-04T18:19:49.996367+00:00"
+ },
+ "2026-11-04T19:21:51.283168+00:00": {
+  "instrument": "XAGUSD (srebro)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-11-04T19:21:55.668933+00:00"
  }
 }
