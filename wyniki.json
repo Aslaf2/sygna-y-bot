@@ -3459,19 +3459,19 @@
   "instrument": "XAGUSD (srebro)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-03T01:23:13.673042+00:00"
+  "rozliczono_utc": "2026-11-04T06:01:39.651681+00:00"
  },
  "2026-11-03T01:54:13.736034+00:00": {
   "instrument": "XAGUSD (srebro)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-03T01:54:18.754272+00:00"
+  "rozliczono_utc": "2026-11-04T06:01:40.290786+00:00"
  },
  "2026-11-03T01:54:16.464855+00:00": {
   "instrument": "HK50 (Hang Seng)",
@@ -3486,10 +3486,10 @@
   "instrument": "XAGUSD (srebro)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-03T02:20:13.041024+00:00"
+  "rozliczono_utc": "2026-11-04T06:01:40.781333+00:00"
  },
  "2026-11-03T02:20:10.785846+00:00": {
   "instrument": "HK50 (Hang Seng)",
