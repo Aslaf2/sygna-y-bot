@@ -3571,5 +3571,14 @@
   "r": 0.0,
   "model": "3R",
   "rozliczono_utc": "2026-11-04T20:18:47.061166+00:00"
+ },
+ "2026-11-05T01:31:02.674318+00:00": {
+  "instrument": "XAUUSD (zloto)",
+  "strona": "LONG",
+  "strategia": "Silver Bullet",
+  "status": "otwarty",
+  "r": 0.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-11-05T01:31:08.459216+00:00"
  }
 }
