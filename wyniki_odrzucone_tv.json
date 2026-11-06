@@ -435,10 +435,10 @@
   "instrument": "HK50 (Hang Seng)",
   "strona": "LONG",
   "strategia": "Liquidity Sweep",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-06T02:11:03.668054+00:00"
+  "rozliczono_utc": "2026-11-06T04:00:29.932809+00:00"
  },
  "2026-11-06T02:16:12.929297+00:00": {
   "instrument": "HK50 (Hang Seng)",
