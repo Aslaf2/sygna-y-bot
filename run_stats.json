@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-11-07T09:43:51.984445+00:00",
- "czas_pl": "07.11.2026 10:43",
+ "czas_utc": "2026-11-07T09:44:24.619436+00:00",
+ "czas_pl": "07.11.2026 10:44",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "scan",
@@ -8,7 +8,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2406
+   "bars": 2410
   },
   "XAGUSD (srebro)": {
    "etap": "scan",
@@ -16,7 +16,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2408
+   "bars": 2410
   },
   "BRENT (ropa)": {
    "etap": "wylaczony",
@@ -24,7 +24,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "sygnaly wylaczone (traci: -0.77R/sygnal live, n=31, 1 cel / 27 stopow)",
-   "bars": 2371
+   "bars": 2374
   },
   "HK50 (Hang Seng)": {
    "etap": "scan",
@@ -52,12 +52,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-11-06T16:55:18.841566+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-11-06T17:00:30.821613+00:00",
    "k": 0,
@@ -1248,6 +1242,12 @@
   },
   {
    "t": "2026-11-07T09:43:51.984445+00:00",
+   "k": 0,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-11-07T09:44:24.619436+00:00",
    "k": 0,
    "z": 0,
    "w": 0
