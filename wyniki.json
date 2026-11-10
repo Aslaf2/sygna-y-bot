@@ -3648,10 +3648,10 @@
   "instrument": "XAGUSD (srebro)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-09T01:18:18.237986+00:00"
+  "rozliczono_utc": "2026-11-10T14:56:28.785608+00:00"
  },
  "2026-11-09T01:54:37.561552+00:00": {
   "instrument": "HK50 (Hang Seng)",
@@ -3675,10 +3675,10 @@
   "instrument": "XAGUSD (srebro)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-09T01:59:54.912258+00:00"
+  "rozliczono_utc": "2026-11-10T14:56:29.280981+00:00"
  },
  "2026-11-09T19:35:52.990657+00:00": {
   "instrument": "XAUUSD (zloto)",
