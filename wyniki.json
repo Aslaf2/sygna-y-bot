@@ -3693,28 +3693,28 @@
   "instrument": "XAGUSD (srebro)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-09T19:41:12.115872+00:00"
+  "rozliczono_utc": "2026-11-10T09:13:02.305605+00:00"
  },
  "2026-11-09T19:56:45.623409+00:00": {
   "instrument": "XAUUSD (zloto)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-09T19:56:51.883274+00:00"
+  "rozliczono_utc": "2026-11-10T09:13:02.784020+00:00"
  },
  "2026-11-09T20:01:59.727265+00:00": {
   "instrument": "XAGUSD (srebro)",
   "strona": "LONG",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-09T20:02:04.831635+00:00"
+  "rozliczono_utc": "2026-11-10T09:13:03.312467+00:00"
  },
  "2026-11-10T01:24:33.730493+00:00": {
   "instrument": "XAUUSD (zloto)",
