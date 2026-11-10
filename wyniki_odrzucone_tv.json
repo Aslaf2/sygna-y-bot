@@ -453,18 +453,18 @@
   "instrument": "XAUUSD (zloto)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-10T19:54:26.802402+00:00"
+  "rozliczono_utc": "2026-11-10T20:35:52.819939+00:00"
  },
  "2026-11-10T20:15:04.761552+00:00": {
   "instrument": "XAUUSD (zloto)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-10T20:15:10.297568+00:00"
+  "rozliczono_utc": "2026-11-10T20:35:52.820613+00:00"
  }
 }
