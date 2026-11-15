@@ -1,6 +1,6 @@
 {
- "czas_utc": "2026-11-15T09:02:26.504065+00:00",
- "czas_pl": "15.11.2026 10:02",
+ "czas_utc": "2026-11-15T09:03:01.159889+00:00",
+ "czas_pl": "15.11.2026 10:03",
  "instrumenty": {
   "XAUUSD (zloto)": {
    "etap": "scan",
@@ -8,7 +8,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2134
+   "bars": 2131
   },
   "XAGUSD (srebro)": {
    "etap": "scan",
@@ -16,7 +16,7 @@
    "zatwierdzone": 0,
    "wyslane": false,
    "opis": "brak setupu na ostatnich swiecach",
-   "bars": 2133
+   "bars": 2131
   },
   "BRENT (ropa)": {
    "etap": "wylaczony",
@@ -52,12 +52,6 @@
   }
  },
  "historia": [
-  {
-   "t": "2026-11-14T16:10:54.648274+00:00",
-   "k": 0,
-   "z": 0,
-   "w": 0
-  },
   {
    "t": "2026-11-14T16:16:11.731274+00:00",
    "k": 0,
@@ -1248,6 +1242,12 @@
   },
   {
    "t": "2026-11-15T09:02:26.504065+00:00",
+   "k": 0,
+   "z": 0,
+   "w": 0
+  },
+  {
+   "t": "2026-11-15T09:03:01.159889+00:00",
    "k": 0,
    "z": 0,
    "w": 0
