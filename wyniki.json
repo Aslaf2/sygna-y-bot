@@ -3882,9 +3882,18 @@
   "instrument": "XAUUSD (zloto)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
+  "status": "SL",
+  "r": -1.0,
+  "model": "3R",
+  "rozliczono_utc": "2026-11-17T01:53:16.140431+00:00"
+ },
+ "2026-11-17T01:53:13.962197+00:00": {
+  "instrument": "HK50 (Hang Seng)",
+  "strona": "SHORT",
+  "strategia": "Silver Bullet",
   "status": "otwarty",
   "r": 0.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-17T01:37:44.314613+00:00"
+  "rozliczono_utc": "2026-11-17T01:53:16.667819+00:00"
  }
 }
