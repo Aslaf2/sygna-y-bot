@@ -3918,18 +3918,18 @@
   "instrument": "XAGUSD (srebro)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-17T19:44:31.421139+00:00"
+  "rozliczono_utc": "2026-11-17T21:43:36.052993+00:00"
  },
  "2026-11-17T20:05:10.744811+00:00": {
   "instrument": "XAGUSD (srebro)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "SL",
+  "r": -1.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-17T20:05:15.147932+00:00"
+  "rozliczono_utc": "2026-11-17T21:43:36.595855+00:00"
  }
 }
