@@ -3792,10 +3792,10 @@
   "instrument": "HK50 (Hang Seng)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "TP",
+  "r": 3.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-12T01:53:54.318841+00:00"
+  "rozliczono_utc": "2026-11-19T02:20:25.655011+00:00"
  },
  "2026-11-12T02:10:03.348422+00:00": {
   "instrument": "XAUUSD (zloto)",
@@ -3945,10 +3945,10 @@
   "instrument": "HK50 (Hang Seng)",
   "strona": "SHORT",
   "strategia": "Silver Bullet",
-  "status": "otwarty",
-  "r": 0.0,
+  "status": "TP",
+  "r": 3.0,
   "model": "3R",
-  "rozliczono_utc": "2026-11-18T01:53:15.559582+00:00"
+  "rozliczono_utc": "2026-11-19T02:20:25.658681+00:00"
  },
  "2026-11-18T02:03:30.370796+00:00": {
   "instrument": "XAUUSD (zloto)",
